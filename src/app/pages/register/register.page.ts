@@ -157,13 +157,14 @@ import { CartService } from '../../core/services/cart.service';
             <input class="field" type="tel"      placeholder="Enter a phone number*" [(ngModel)]="phone"    />
             <input class="field" type="email"    placeholder="Email Address"         [(ngModel)]="email"    />
             <input class="field" type="password" placeholder="Password*"             [(ngModel)]="password" />
+            <input class="field" type="password" placeholder="Confirm Password*"     [(ngModel)]="confirmPassword" />
 
             <div class="checkbox-row">
               <ion-checkbox></ion-checkbox>
               <span class="checkbox-label">I agree to receive emails and notification updates.</span>
             </div>
 
-            <button class="btn-send" (click)="register()">Send Code</button>
+            <button class="btn-send" (click)="register()">Sign Up</button>
           </div>
 
           <div class="divider"></div>
@@ -183,8 +184,18 @@ export class RegisterPage {
   phone = '';
   email = '';
   password = '';
+  confirmPassword = '';
 
   register(): void {
+    if (!this.name || !this.phone || !this.email || !this.password) {
+      alert('Please fill all required fields');
+      return;
+    }
+    if (this.password !== this.confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
     this.authService.register({ name: this.name, phone: this.phone, email: this.email, password: this.password }).subscribe(() => {
       const pending = this.cartService.consumePendingItem();
       if (pending) {
