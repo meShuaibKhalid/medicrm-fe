@@ -8,24 +8,25 @@ import { Category } from '../../models/app.models';
   standalone: true,
   imports: [RouterLink, IonButton, IonIcon],
   template: `
-    <ion-button class="category-card" fill="clear" [routerLink]="['/categories', category.slug, 'products']">
+    <button class="category-card" fill="clear" [routerLink]="['/categories', category.slug, 'products']">
       <span>{{ category.name }}</span>
       <ion-icon name="chevron-down-outline"></ion-icon>
-    </ion-button>
+    </button>
   `,
   styles: [`
     .category-card {
-      --color: #222;
-      --padding-start: 16px;
-      --padding-end: 16px;
-      --padding-top: 12px;
-      --padding-bottom: 12px;
-      margin: 0;
-      border: 1px solid #e3e6ef;
-      border-radius: 14px;
-      text-transform: none;
-      font-weight: 600;
-      justify-content: space-between;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      font-size: 13px;
+      text-decoration: none;
+      color: inherit;
+      text-transform: capitalize;
+      padding: 15px 0 8px;
+      width: 100%;
+      background: transparent;
     }
     ion-icon {
       margin-left: 8px;

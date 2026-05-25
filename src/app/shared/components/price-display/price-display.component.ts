@@ -18,7 +18,17 @@ import { IonBadge } from '@ionic/angular/standalone';
   styles: [`
     .price-wrap { display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .prices { display:flex; flex-direction:column; gap:2px; }
-    strong { color:#1777b6; font-size:1rem; }
+    strong { 
+          display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-transform: capitalize; 
+            color: #bb5a77;
+    font-weight: 700;
+    font-size: .9rem;
+    transform: translateY(2px);
+    }
     span { font-size:.82rem; }
   `],
 })

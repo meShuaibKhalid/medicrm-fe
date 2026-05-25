@@ -25,6 +25,10 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
+*{
+  font-family: "Inter", sans-serif;
+}
+
 html,
 body {
   background: #ffffff;
@@ -33,7 +37,6 @@ body {
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   overflow-x: hidden;
 }
 
@@ -47,7 +50,7 @@ ion-content {
 }
 
 .page-shell {
-  padding: 16px;
+  padding: 16px 16px 10px;
   max-width: 1500px;
   margin: 0 auto;
 }
@@ -57,14 +60,25 @@ ion-content {
   align-items: center;
   justify-content: space-between;
   margin: 18px 0 14px;
+  button{
+        background-color: #bb5a77;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    font-size: .8rem!important;
+    color: #fff!important;
+    border-radius: 8px;
+  }
 }
 
 .section-title h2,
 .section-title h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #b6667d;
+    font-weight: 600;
+    text-transform: capitalize;
+    position: relative;
+    font-size: 1.4rem;
+    margin-bottom: 0;
+    color: #b6667d;
+
 }
 
 .soft-card {
@@ -149,8 +163,17 @@ ion-content {
   font-size: 14px;
 }
 
-@media (min-width: 768px) {
-  .page-shell {
-    padding: 24px 28px;
+.w-full{
+  width: 100%;
+}
+ion-content{
+  &::part(scroll){
+    scrollbar-width: thin;
   }
 }
+
+// @media (min-width: 768px) {
+//   .page-shell {
+//     padding: 24px 28px;
+//   }
+// }

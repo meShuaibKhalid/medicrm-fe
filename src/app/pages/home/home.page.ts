@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { IonBadge, IonButton, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonSearchbar, IonToolbar } from '@ionic/angular/standalone';
+import { IonBadge, IonButton, IonCard, IonImg, IonCardContent, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonSearchbar, IonToolbar, IonFooter } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { CategoryService } from '../../core/services/category.service';
@@ -13,44 +13,47 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, IonBadge, IonButton, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonSearchbar, IonToolbar, CategoryCardComponent, ProductCardComponent],
+  imports: [CommonModule, RouterLink, IonBadge, IonImg, IonButton, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonSearchbar, IonToolbar, CategoryCardComponent, ProductCardComponent, IonFooter],
   template: `
     <ion-header class="ion-no-border dvago-shell">
       <ion-toolbar class="dvago-toolbar">
         <div class="topbar page-shell">
-          <div class="brand-block">
+          <!-- <div class="brand-block">
             <h1>DVAGO</h1>
             <span>Pharmacy & Wellness Experts</span>
-          </div>
+          </div> -->
+          <ion-img src="assets/logo.svg" height="48" class="logo"></ion-img>
 
-          <ion-searchbar class="dvago-searchbar search-block" placeholder='Search for "Personal Care"' [value]="searchTerm" (ionInput)="onSearch($event)"></ion-searchbar>
+
+          <ion-searchbar class="dvago-searchbar search-block utility-pill" placeholder='Search for "Personal Care"' [value]="searchTerm" (ionInput)="onSearch($event)" mode="ios"></ion-searchbar>
 
           <button class="utility-pill address-pill" type="button">
             <ion-icon name="location-outline"></ion-icon>
-            <span>No Address Selected</span>
+            <span style="margin-right:auto">No Address Selected</span>
             <ion-icon name="chevron-forward-outline"></ion-icon>
           </button>
 
           <div class="action-pills">
-            <button class="utility-pill green-pill" type="button">
+            <!-- <button class="header-btn download-btn" type="button">
               <ion-icon name="apps-outline"></ion-icon>
               <span>Download the App</span>
             </button>
-            <button class="utility-pill primary-pill" type="button">
+            <button class="header-btn instant-btn" type="button">
               <ion-icon name="radio-button-on-outline"></ion-icon>
               <span>Instant Order</span>
-            </button>
-            <button class="icon-pill" type="button" routerLink="/profile"><ion-icon name="person-outline"></ion-icon></button>
-            <button class="icon-pill" type="button"><ion-icon name="heart-outline"></ion-icon></button>
-            <button class="icon-pill" type="button" routerLink="/cart"><ion-icon name="cart-outline"></ion-icon></button>
+            </button> -->
+            <div class="header-btn instant-btn action-btns">
+              <button type="button" routerLink="/profile"><ion-icon name="person-outline"></ion-icon></button>
+              <button type="button"><ion-icon name="heart-outline"></ion-icon></button>
+              <button type="button" routerLink="/cart"><ion-icon name="cart-outline"></ion-icon></button>
+            </div>
           </div>
         </div>
       </ion-toolbar>
       <ion-toolbar class="category-toolbar">
         <div class="page-shell nav-scroll">
-          <app-category-card *ngFor="let category of categories" [category]="category"></app-category-card>
-          <ion-button class="nav-link-btn" fill="clear">OTC And Health Need <ion-icon slot="end" name="chevron-down-outline"></ion-icon></ion-button>
-        </div>
+          <app-category-card class="category-list" *ngFor="let category of categories" [category]="category"></app-category-card>
+          </div>
       </ion-toolbar>
     </ion-header>
 
@@ -65,22 +68,32 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
           </ion-card-content>
         </ion-card>
 
-        <div class="section-title"><h2>Trending Categories</h2></div>
+        <div class="section-title">
+          <h2>Trending Categories</h2>
+          <button>View All</button>
+        </div>
         <div class="dvago-chip-list">
           <button class="dvago-outlined-chip" *ngFor="let category of categories" [routerLink]="['/categories', category.slug, 'products']">{{ category.name }}</button>
         </div>
 
-        <div class="section-title"><h2>Featured Products</h2></div>
+        <div class="section-title">
+          <h2>Featured Products</h2>
+          <button>View All</button>
+        </div>
         <div class="product-grid">
           <app-product-card *ngFor="let product of filteredFeaturedProducts" [product]="product" (addToCart)="addToCart($event)" (openProduct)="openProduct($event)"></app-product-card>
         </div>
 
-        <div class="section-title"><h2>Discounted Products</h2></div>
+        <div class="section-title">
+          <h2>Discounted Products</h2>
+        <button>View All</button></div>
         <div class="product-grid">
           <app-product-card *ngFor="let product of filteredDiscountedProducts" [product]="product" (addToCart)="addToCart($event)" (openProduct)="openProduct($event)"></app-product-card>
         </div>
 
-        <div class="section-title"><h2>Devices & Support</h2></div>
+        <div class="section-title">
+          <h2>Devices & Support</h2>
+      <button>View All</button></div>
         <ion-list class="soft-card info-list">
           <ion-item lines="none">
             <ion-icon slot="start" name="medical-outline" color="secondary"></ion-icon>
@@ -93,13 +106,17 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
         </ion-list>
       </div>
     </ion-content>
+
   `,
   styles: [`
     .topbar {
-      display: grid;
-      grid-template-columns: 1fr;
+      display: flex;
       gap: 12px;
       align-items: center;
+      flex-wrap: wrap;
+      .logo{
+        height: 48px;
+      }
     }
     .brand-block h1 {
       margin: 0;
@@ -120,17 +137,22 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     }
     .utility-pill,
     .icon-pill {
-      border: 0;
-      background: #fff;
-      min-height: 54px;
-      border-radius: 18px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 18px;
-      font-weight: 700;
-      color: #222;
-      border: 1px solid #e3e6ef;
+    flex: 1;
+    border: 0;
+    background: #fff;
+    min-height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 5px;
+    font-weight: 700;
+    color: #222;
+    border: 1px solid #e3e6ef;
+    font-size: 12px;
+    max-width: 380px;
+    min-width: 130px;
     }
     .utility-pill ion-icon,
     .icon-pill ion-icon {
@@ -144,10 +166,38 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
       overflow-y: hidden;
       touch-action: pan-x;
       -webkit-overflow-scrolling: touch;
+      margin-left: auto;
     }
     .action-pills::-webkit-scrollbar,
     .nav-scroll::-webkit-scrollbar {
       display: none;
+    }
+
+    .header-btn{
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #5e971a;
+    color: #fff;
+    padding: 7px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1;
+    margin-left: 6px;
+    height: fit-content;
+    white-space: nowrap;
+    &.instant-btn{
+      background-color: #bb5a77 !important;
+    }
+    &.action-btns{
+      button{
+        background: transparent;
+      }
+    }
+    ion-icon{
+      font-size: 25px;
+      margin-right: 4px;
+    }
     }
     .green-pill {
       background: #7ea731;
@@ -177,14 +227,21 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     }
     .nav-scroll {
       display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      align-items: center;
-      padding-top: 0;
-      padding-bottom: 10px;
-      touch-action: pan-x;
-      -webkit-overflow-scrolling: touch;
+      justify-content: unset;
+      align-items: unset;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      padding: 0 5px;
+      .category-list{
+          display: flex;
+          justify-content: center;
+          align-items: unset;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          padding: 0 5px;
+          flex-grow: 1;
+          position: relative;
+      }
     }
     .nav-link-btn {
       --color: #222;
@@ -220,10 +277,20 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     .info-list {
       overflow: hidden;
     }
-    @media (min-width: 992px) {
-      .topbar {
-        grid-template-columns: 240px minmax(280px, 1fr) 330px auto;
+
+    :host ::ng-deep{
+      ion-searchbar{
+        input{
+          background: transparent !important;
+          font-size: 12px !important  ;
+        }
       }
+    }
+
+    @media (min-width: 992px) {
+      // .topbar {
+      //   grid-template-columns: 240px minmax(280px, 1fr) 330px auto;
+      // }
       .product-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
@@ -233,6 +300,8 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
         grid-template-columns: repeat(5, minmax(0, 1fr));
       }
     }
+    
+ 
   `],
 })
 export class HomePage {

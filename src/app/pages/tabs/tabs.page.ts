@@ -6,8 +6,8 @@ import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } 
   standalone: true,
   imports: [IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs],
   template: `
-    <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
+    <ion-tabs>
       <ion-tab-bar slot="bottom">
         <ion-tab-button tab="home" href="/home">
           <ion-icon name="home-outline"></ion-icon>
