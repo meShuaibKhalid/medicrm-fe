@@ -27,7 +27,7 @@ export class AuthService {
   
   // Using an environment variable or a base API URL constant would be better here
   // Assuming frontend is running and backend is on port 3000
-  private readonly apiUrl = 'http://localhost:3000/api/auth';
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
 
   constructor() {
     this.initAuth();

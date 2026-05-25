@@ -1,49 +1,59 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { forkJoin, map, Observable, of } from 'rxjs';
 import { Category, Order, OrderStatus, Product, User } from '../../shared/models/app.models';
-import { MOCK_CATEGORIES, MOCK_USERS } from '../../shared/data/mock-data';
+import { MOCK_CATEGORIES } from '../../shared/data/mock-data';
 import { ProductService } from './product.service';
 import { OrderService } from './order.service';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from './api.models';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly productService = inject(ProductService);
   private readonly orderService = inject(OrderService);
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}/admin`;
 
   getDashboardStats(): Observable<{ label: string; value: number }[]> {
-    return this.productService.getProducts().pipe(
-      map((products) => {
-        const orders = this.orderService.getCurrentOrders();
+    return forkJoin({
+      products: this.productService.getProducts(),
+      orders: this.getOrders(),
+      users: this.getUsers(),
+    }).pipe(
+      map(({ products, orders, users }) => {
         return [
           { label: 'Total products', value: products.length },
           { label: 'Total orders', value: orders.length },
           { label: 'Pending orders', value: orders.filter((order) => order.status === 'pending').length },
           { label: 'Completed orders', value: orders.filter((order) => order.status === 'completed').length },
-          { label: 'Total users', value: MOCK_USERS.filter((user) => user.role === 'customer').length },
+          { label: 'Total users', value: users.filter((user) => user.role === 'user').length },
           { label: 'Low stock products', value: products.filter((product) => product.stock < 20).length },
         ];
-      }),
+      })
     );
   }
 
   getUsers(): Observable<User[]> {
-    return of(MOCK_USERS);
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/users`).pipe(
+      map((res) => res.data.map((u: any) => ({ ...u, id: u._id || u.id })))
+    );
   }
 
   updateUserStatus(id: string, isActive: boolean): Observable<boolean> {
-    const user = MOCK_USERS.find((item) => item.id === id);
-    if (user) {
-      user.isActive = isActive;
-    }
-    return of(true);
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/users/${id}/status`, { isActive }).pipe(map(() => true));
   }
 
   getOrders(): Observable<Order[]> {
-    return this.orderService.getMyOrders();
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/orders`).pipe(
+      map((res) => res.data.map((o: any) => ({ ...o, id: o._id || o.id })))
+    );
   }
 
   updateOrderStatus(id: string, status: OrderStatus): Observable<Order | undefined> {
-    return this.orderService.updateOrderStatus(id, status);
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/orders/${id}/status`, { status }).pipe(
+      map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
+    );
   }
 
   createProduct(product: Product): Observable<Product> {

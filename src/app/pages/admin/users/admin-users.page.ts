@@ -33,8 +33,10 @@ export class AdminUsersPage {
   users: User[] = [];
   search = '';
 
-  constructor() {
-    this.adminService.getUsers().subscribe((users) => this.users = users.filter((user) => user.role === 'customer'));
+  constructor() {}
+
+  ionViewWillEnter() {
+    this.adminService.getUsers().subscribe((users) => this.users = users.filter((user) => user.role === 'user'));
   }
 
   get filteredUsers(): User[] {

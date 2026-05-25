@@ -160,15 +160,20 @@ export class LoginPage {
   password = 'password';
 
   login(): void {
-    this.authService.login(this.identifier, this.password).subscribe(() => {
-      const pending = this.cartService.consumePendingItem();
-      if (pending) {
-        this.cartService.addItem(pending.product, pending.quantity);
-        this.router.navigateByUrl(pending.returnUrl || '/cart');
-        return;
+    this.authService.login(this.identifier, this.password).subscribe({
+      next: () => {
+        const pending = this.cartService.consumePendingItem();
+        if (pending) {
+          this.cartService.addItem(pending.product, pending.quantity);
+          this.router.navigateByUrl(pending.returnUrl || '/cart');
+          return;
+        }
+        const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo') ?? '/home';
+        this.router.navigateByUrl(redirectTo);
+      },
+      error: (err) => {
+        alert(err.error?.message || 'Login failed. Please check your credentials.');
       }
-      const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo') ?? '/home';
-      this.router.navigateByUrl(redirectTo);
     });
   }
 }
