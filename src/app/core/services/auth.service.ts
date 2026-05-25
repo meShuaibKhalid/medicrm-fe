@@ -1,33 +1,80 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { MOCK_USERS } from '../../shared/data/mock-data';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 import { User } from '../../shared/models/app.models';
+import { environment } from '../../../environments/environment';
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    user: User;
+  };
+}
+
+export interface UserResponse {
+  success: boolean;
+  message: string;
+  data: User;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly http = inject(HttpClient);
   private readonly currentUserSubject = new BehaviorSubject<User | null>(null);
   readonly currentUser$ = this.currentUserSubject.asObservable();
+  
+  // Using an environment variable or a base API URL constant would be better here
+  // Assuming frontend is running and backend is on port 3000
+  private readonly apiUrl = 'http://localhost:3000/api/auth';
 
-  login(identifier: string, _password: string, admin = false): Observable<User | null> {
-    const user = MOCK_USERS.find((item) => admin ? item.role === 'admin' && item.email === identifier : item.email === identifier || item.phone === identifier) ?? null;
-    this.currentUserSubject.next(user);
-    return of(user);
+  constructor() {
+    this.initAuth();
   }
 
-  register(payload: Omit<User, 'id' | 'role' | 'isActive'> & { password: string }): Observable<User> {
-    const user: User = {
-      id: `usr-${Date.now()}`,
-      name: payload.name,
-      email: payload.email,
-      phone: payload.phone,
-      role: 'customer',
-      isActive: true,
-    };
-    this.currentUserSubject.next(user);
-    return of(user);
+  private initAuth(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.http.get<UserResponse>(`${this.apiUrl}/me`).subscribe({
+        next: (res) => {
+          if (res.success && res.data) {
+            this.currentUserSubject.next(res.data);
+          } else {
+            this.logout();
+          }
+        },
+        error: () => this.logout()
+      });
+    }
+  }
+
+  login(identifier: string, password: string, _admin = false): Observable<User | null> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { identifier, password }).pipe(
+      tap((res) => {
+        if (res.success && res.data) {
+          localStorage.setItem('token', res.data.token);
+          this.currentUserSubject.next(res.data.user);
+        }
+      }),
+      map(res => res.data?.user || null)
+    );
+  }
+
+  register(payload: Omit<User, 'id' | 'role' | 'isActive'> & { password: string }): Observable<User | null> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, payload).pipe(
+      tap((res) => {
+        if (res.success && res.data) {
+          localStorage.setItem('token', res.data.token);
+          this.currentUserSubject.next(res.data.user);
+        }
+      }),
+      map(res => res.data?.user || null)
+    );
   }
 
   logout(): void {
+    localStorage.removeItem('token');
     this.currentUserSubject.next(null);
   }
 

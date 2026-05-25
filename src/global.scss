@@ -45,6 +45,10 @@ ion-app {
   height: 100%;
 }
 
+ion-router-outlet {
+  margin-top: 120px;
+}
+
 ion-content {
   --background: #ffffff;
 }
