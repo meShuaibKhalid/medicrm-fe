@@ -15,48 +15,6 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
   standalone: true,
   imports: [CommonModule, RouterLink, IonBadge, IonImg, IonButton, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonSearchbar, IonToolbar, CategoryCardComponent, ProductCardComponent, IonFooter],
   template: `
-    <ion-header class="ion-no-border dvago-shell">
-      <ion-toolbar class="dvago-toolbar">
-        <div class="topbar page-shell">
-          <!-- <div class="brand-block">
-            <h1>DVAGO</h1>
-            <span>Pharmacy & Wellness Experts</span>
-          </div> -->
-          <ion-img src="assets/logo.svg" height="48" class="logo"></ion-img>
-
-
-          <ion-searchbar class="dvago-searchbar search-block utility-pill" placeholder='Search for "Personal Care"' [value]="searchTerm" (ionInput)="onSearch($event)" mode="ios"></ion-searchbar>
-
-          <button class="utility-pill address-pill" type="button">
-            <ion-icon name="location-outline"></ion-icon>
-            <span style="margin-right:auto">No Address Selected</span>
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </button>
-
-          <div class="action-pills">
-            <!-- <button class="header-btn download-btn" type="button">
-              <ion-icon name="apps-outline"></ion-icon>
-              <span>Download the App</span>
-            </button>
-            <button class="header-btn instant-btn" type="button">
-              <ion-icon name="radio-button-on-outline"></ion-icon>
-              <span>Instant Order</span>
-            </button> -->
-            <div class="header-btn instant-btn action-btns">
-              <button type="button" routerLink="/profile"><ion-icon name="person-outline"></ion-icon></button>
-              <button type="button"><ion-icon name="heart-outline"></ion-icon></button>
-              <button type="button" routerLink="/cart"><ion-icon name="cart-outline"></ion-icon></button>
-            </div>
-          </div>
-        </div>
-      </ion-toolbar>
-      <ion-toolbar class="category-toolbar">
-        <div class="page-shell nav-scroll">
-          <app-category-card class="category-list" *ngFor="let category of categories" [category]="category"></app-category-card>
-          </div>
-      </ion-toolbar>
-    </ion-header>
-
     <ion-content>
       <div class="page-shell homepage-shell">
         <ion-card class="hero soft-card">

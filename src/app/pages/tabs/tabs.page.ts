@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
+import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 
 @Component({
   selector: 'app-tabs',
   standalone: true,
-  imports: [IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs],
+  imports: [IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, HeaderComponent],
   template: `
-      <ion-router-outlet></ion-router-outlet>
+    <ion-router-outlet></ion-router-outlet>
     <ion-tabs>
       <ion-tab-bar slot="bottom">
         <ion-tab-button tab="home" href="/home">

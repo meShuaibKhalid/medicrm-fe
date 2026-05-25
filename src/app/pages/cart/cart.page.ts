@@ -15,53 +15,6 @@ import { ProductService } from 'src/app/core/services/product.service';
   standalone: true,
   imports: [CommonModule, RouterLink, IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, EmptyStateComponent, PriceDisplayComponent,IonSearchbar, IonImg, IonIcon,CategoryCardComponent],
   template: `
-<!-- <ion-header class="ion-no-border">
-    <ion-toolbar>
-      <ion-title>Cart</ion-title>
-    </ion-toolbar>
-  </ion-header> -->
-      <ion-header class="ion-no-border dvago-shell">
-      <ion-toolbar class="dvago-toolbar">
-        <div class="topbar page-shell">
-          <!-- <div class="brand-block">
-            <h1>DVAGO</h1>
-            <span>Pharmacy & Wellness Experts</span>
-          </div> -->
-          <ion-img src="assets/logo.svg" height="48" class="logo"></ion-img>
-
-
-          <ion-searchbar class="dvago-searchbar search-block utility-pill" placeholder='Search for "Personal Care"' [value]="searchTerm" (ionInput)="onSearch($event)" mode="ios"></ion-searchbar>
-
-          <button class="utility-pill address-pill" type="button">
-            <ion-icon name="location-outline"></ion-icon>
-            <span style="margin-right:auto">No Address Selected</span>
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </button>
-
-          <div class="action-pills">
-            <!-- <button class="header-btn download-btn" type="button">
-              <ion-icon name="apps-outline"></ion-icon>
-              <span>Download the App</span>
-            </button>
-            <button class="header-btn instant-btn" type="button">
-              <ion-icon name="radio-button-on-outline"></ion-icon>
-              <span>Instant Order</span>
-            </button> -->
-            <div class="header-btn instant-btn action-btns">
-              <button type="button" routerLink="/profile"><ion-icon name="person-outline"></ion-icon></button>
-              <button type="button"><ion-icon name="heart-outline"></ion-icon></button>
-              <button type="button" routerLink="/cart"><ion-icon name="cart-outline"></ion-icon></button>
-            </div>
-          </div>
-        </div>
-      </ion-toolbar>
-      <ion-toolbar class="category-toolbar">
-        <div class="page-shell nav-scroll">
-          <app-category-card class="category-list" *ngFor="let category of categories" [category]="category"></app-category-card>
-          </div>
-      </ion-toolbar>
-    </ion-header>
-  
   <ion-content>
     <div class="page-shell cart-page">
       <div class="dvago-breadcrumb">
@@ -356,39 +309,9 @@ styles: [`
   `],
 })
 export class CartPage {
-  private readonly categoryService = inject(CategoryService);
-    private readonly productService = inject(ProductService);
-  categories: Category[] = [];
-    featuredProducts: Product[] = [];
-      filteredFeaturedProducts: Product[] = [];
-        discountedProducts: Product[] = [];
-        filteredDiscountedProducts: Product[] = [];
-    searchTerm = '';
-    loading = false;
   readonly cartService = inject(CartService);
- constructor() {
-    this.categoryService.getCategories().subscribe((categories) => this.categories = categories.filter((category) => category.level === 0).slice(0, 6));
-    this.loadHomeProducts();
-  }
-    onSearch(event: CustomEvent): void {
-    const value = (event.detail.value ?? '').trim();
-    this.searchTerm = value;
-    this.loadHomeProducts();
-  }
+
   get cart() {
     return this.cartService.getCurrentCart();
-  }
-    private loadHomeProducts(): void {
-    this.loading = true;
-    this.productService.getProducts({ search: this.searchTerm, limit: 8, sort: 'latest' }).subscribe((products) => {
-      this.featuredProducts = products;
-      this.filteredFeaturedProducts = this.featuredProducts;
-      this.loading = false;
-    });
-
-    this.productService.getProducts({ search: this.searchTerm, limit: 24, sort: 'latest', discountedOnly: true }).subscribe((products) => {
-      this.discountedProducts = products.slice(0, 8);
-      this.filteredDiscountedProducts = this.discountedProducts;
-    });
   }
 }

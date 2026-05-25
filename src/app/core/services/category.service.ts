@@ -19,7 +19,10 @@ export class CategoryService {
   getCategoryTree(): Observable<Category[]> {
     return this.http
       .get<ApiResponse<any[]>>(`${this.baseUrl}/tree`)
-      .pipe(map((response) => response.data.map((category) => this.mapCategory(category))));
+      .pipe(
+        map((response) => response.data.map((category) => this.mapCategory(category))),
+        map((categories) => categories.sort((a, b) => (a.order ?? 999) - (b.order ?? 999)))
+      );
   }
 
   getCategoryBySlug(slug: string): Observable<Category | undefined> {
@@ -29,14 +32,20 @@ export class CategoryService {
   }
 
   private mapCategory(category: any): Category {
+    const children = Array.isArray(category.children) 
+      ? category.children.map((child: any) => this.mapCategory(child)).sort((a: Category, b: Category) => a.name.localeCompare(b.name))
+      : [];
+      
     return {
       id: String(category._id ?? category.id),
       name: category.name,
       slug: category.slug,
       parentId: category.parentId ? String(category.parentId) : null,
       level: Number(category.level ?? 0),
+      order: typeof category.order === 'number' ? category.order : undefined,
       isActive: Boolean(category.isActive),
-      children: Array.isArray(category.children) ? category.children.map((child: any) => this.mapCategory(child)) : [],
+      createdAt: category.createdAt,
+      children: children,
     };
   }
 }

@@ -5,7 +5,7 @@ import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonList, IonSelect,
 import { CategoryService } from '../../../core/services/category.service';
 import { Category } from '../../../shared/models/app.models';
 
-@Component({
+@Component({ 
   selector: 'app-admin-categories',
   standalone: true,
   imports: [CommonModule, FormsModule, IonButton, IonContent, IonInput, IonItem, IonLabel, IonList, IonSelect, IonSelectOption, IonToggle],

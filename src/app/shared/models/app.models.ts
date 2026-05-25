@@ -24,7 +24,9 @@ export interface Category {
   parentId: string | null;
   children?: Category[];
   level: number;
+  order?: number;
   isActive: boolean;
+  createdAt?: string
 }
 
 export interface CartItem {
