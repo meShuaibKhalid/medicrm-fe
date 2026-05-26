@@ -145,7 +145,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     height: fit-content;
     white-space: nowrap;
     &.instant-btn{
-      background-color: #bb5a77 !important;
+      background-color: var(--ion-color-primary) !important;
     }
     &.action-btns{
       button{

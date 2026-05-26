@@ -1,5 +1,9 @@
 <ion-app>
-  <app-header></app-header>
-  <ion-router-outlet></ion-router-outlet>
+  <div style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+    <app-header style="flex-shrink: 0; display: block;"></app-header>
+    <div style="flex: 1; position: relative;">
+      <ion-router-outlet></ion-router-outlet>
+    </div>
+  </div>
 </ion-app>
  

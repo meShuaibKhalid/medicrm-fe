@@ -82,17 +82,17 @@ import { Address } from '../../shared/models/app.models';
     </ion-content>
   `,
   styles: [`
-    :host { --ion-background-color: #faf5f7; }
+    :host { --ion-background-color: var(--color-ice-blue); }
 
     .header-title {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-weight: 700;
-      color: #2a1a22;
+      color: var(--color-navy-black);
     }
 
     .page-container {
       padding: 1rem;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       max-width: 700px;
       margin: 0 auto;
     }
@@ -106,16 +106,16 @@ import { Address } from '../../shared/models/app.models';
     }
 
     .address-card {
-      background: #ffffff;
-      border-radius: 16px;
+      background: var(--color-white-near-white);
+      border-radius: var(--app-border-radius-large, 18px);
       padding: 1.25rem;
       box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-      border: 1px solid #f0e0e8;
+      border: 1px solid var(--color-soft-blue-gray);
       transition: box-shadow 0.2s;
     }
 
     .address-card:hover {
-      box-shadow: 0 8px 24px rgba(180,60,100,0.08);
+      box-shadow: 0 8px 24px rgba(14,168,125,0.08);
     }
 
     .address-header {
@@ -132,7 +132,7 @@ import { Address } from '../../shared/models/app.models';
     }
 
     .location-icon {
-      color: #d45a85;
+      color: var(--ion-color-primary);
       font-size: 20px;
     }
 
@@ -140,16 +140,16 @@ import { Address } from '../../shared/models/app.models';
       margin: 0;
       font-size: 16px;
       font-weight: 700;
-      color: #2a1a22;
+      color: var(--color-navy-black);
     }
 
     .default-badge {
-      background: #eef8f1;
-      color: #2e8b46;
+      background: var(--color-pale-mint);
+      color: var(--ion-color-primary);
       font-size: 11px;
       font-weight: 700;
       padding: 4px 8px;
-      border-radius: 8px;
+      border-radius: var(--app-border-radius-small, 8px);
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -157,18 +157,18 @@ import { Address } from '../../shared/models/app.models';
     .address-body p {
       margin: 0 0 0.4rem;
       font-size: 14px;
-      color: #5c4b53;
+      color: var(--color-slate-gray);
       line-height: 1.4;
     }
 
     .address-body .phone {
       font-weight: 600;
-      color: #2a1a22;
+      color: var(--color-navy-black);
     }
 
     .address-body .landmark {
       font-size: 13px;
-      color: #9a7a88;
+      color: var(--color-blue-gray);
       font-style: italic;
     }
 
@@ -177,7 +177,7 @@ import { Address } from '../../shared/models/app.models';
       gap: 8px;
       margin-top: 1rem;
       padding-top: 1rem;
-      border-top: 1px dashed #f0e0e8;
+      border-top: 1px dashed var(--color-soft-blue-gray);
     }
 
     .btn-action {
@@ -187,33 +187,34 @@ import { Address } from '../../shared/models/app.models';
       font-weight: 700;
       cursor: pointer;
       padding: 6px 12px;
-      border-radius: 8px;
+      border-radius: var(--app-border-radius-small, 8px);
       transition: background 0.2s;
     }
 
-    .btn-action.edit { color: #d45a85; background: #fff0f5; }
-    .btn-action.edit:hover { background: #f9c2d4; }
+    .btn-action.edit { color: var(--ion-color-primary); background: var(--color-pale-mint); }
+    .btn-action.edit:hover { background: var(--color-soft-blue-gray); }
     
-    .btn-action.delete { color: #d33; background: #ffeeee; }
+    .btn-action.delete { color: var(--ion-color-danger); background: #ffeeee; }
     .btn-action.delete:hover { background: #ffdddd; }
 
-    .btn-action.set-default { color: #4a90e2; background: #f0f7ff; margin-left: auto; }
+    .btn-action.set-default { color: var(--ion-color-secondary); background: #f0f7ff; margin-left: auto; }
     .btn-action.set-default:hover { background: #ddecff; }
 
 
     /* Form Styles */
     .form-container {
-      background: #ffffff;
-      border-radius: 20px;
+      background: var(--color-white-near-white);
+      border-radius: var(--app-border-radius-large, 18px);
       padding: 1.5rem;
       box-shadow: 0 8px 30px rgba(0,0,0,0.03);
+      border: 1px solid var(--color-soft-blue-gray);
     }
 
     .section-title h3 {
       margin: 0 0 1.5rem;
       font-size: 18px;
       font-weight: 700;
-      color: #2a1a22;
+      color: var(--color-navy-black);
     }
 
     .form-stack {
@@ -232,12 +233,12 @@ import { Address } from '../../shared/models/app.models';
 
     .field {
       width: 100%;
-      border: 1.5px solid #ebd5de;
-      border-radius: 12px;
+      border: 1.5px solid var(--color-soft-blue-gray);
+      border-radius: var(--app-border-radius, 12px);
       padding: 0.8rem 1rem;
       font-size: 14px;
-      color: #2a1a22;
-      background: #fdfafb;
+      color: var(--color-navy-black);
+      background: var(--color-white-near-white);
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
@@ -247,11 +248,11 @@ import { Address } from '../../shared/models/app.models';
       font-family: inherit;
     }
 
-    .field::placeholder { color: #c4a0b0; }
+    .field::placeholder { color: var(--color-blue-gray); }
     .field:focus {
-      border-color: #d45a85;
-      box-shadow: 0 0 0 3px rgba(212,90,133,0.10);
-      background: #fff;
+      border-color: var(--ion-color-primary);
+      box-shadow: 0 0 0 3px rgba(14,168,125,0.10);
+      background: var(--color-white-near-white);
     }
 
     .checkbox-row {
@@ -263,7 +264,7 @@ import { Address } from '../../shared/models/app.models';
 
     .checkbox-label {
       font-size: 14px;
-      color: #7a5568;
+      color: var(--color-slate-gray);
     }
 
     /* Map Box */
@@ -276,25 +277,25 @@ import { Address } from '../../shared/models/app.models';
     
     .map-box {
       height: 140px;
-      border-radius: 14px;
-      border: 1.5px dashed #d45a85;
+      border-radius: var(--app-border-radius, 12px);
+      border: 1.5px dashed var(--ion-color-primary);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #b05070;
+      color: var(--ion-color-primary);
       font-size: 13px;
       font-weight: 600;
-      background: #fff0f5;
+      background: var(--color-pale-mint);
     }
 
     .btn-secondary {
       width: 100%;
       padding: 0.8rem;
-      background: #fff;
-      color: #2a1a22;
-      border: 1.5px solid #ebd5de;
-      border-radius: 12px;
+      background: var(--color-white-near-white);
+      color: var(--color-navy-black);
+      border: 1.5px solid var(--color-soft-blue-gray);
+      border-radius: var(--app-border-radius, 12px);
       font-size: 14px;
       font-weight: 600;
       display: flex;
@@ -307,18 +308,18 @@ import { Address } from '../../shared/models/app.models';
     .btn-primary {
       width: 100%;
       padding: 1rem;
-      background: #c94c7e;
+      background: var(--ion-color-primary);
       color: #fff;
       font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.05em;
       border: none;
-      border-radius: 14px;
+      border-radius: var(--app-border-radius, 12px);
       cursor: pointer;
       margin-top: 1rem;
       transition: background 0.2s;
     }
-    .btn-primary:hover { background: #b33f6c; }
+    .btn-primary:hover { background: var(--color-fresh-green); }
   `],
 })
 export class AddressesPage {

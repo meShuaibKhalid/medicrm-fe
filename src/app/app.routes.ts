@@ -22,6 +22,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/orders/orders.page').then((m) => m.OrdersPage),
       },
       {
+        path: 'wishlist',
+        loadComponent: () => import('./pages/wishlist/wishlist.page').then((m) => m.WishlistPage),
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./pages/profile/profile.page').then((m) => m.ProfilePage),
       },

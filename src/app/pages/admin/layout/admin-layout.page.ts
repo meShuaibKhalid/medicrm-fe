@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonHeader, IonItem, IonList, IonMenu, IonMenuButton, IonRouterOutlet, IonSplitPane, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -18,6 +19,12 @@ import { IonContent, IonHeader, IonItem, IonList, IonMenu, IonMenuButton, IonRou
             <ion-item routerLink="/admin/categories">Categories</ion-item>
             <ion-item routerLink="/admin/orders">Orders</ion-item>
             <ion-item routerLink="/admin/users">Users</ion-item>
+            <ion-item routerLink="/home">
+              Switch to User View
+            </ion-item>
+            <ion-item (click)="logout()" style="--color: #eb445a; font-weight: 600; cursor: pointer;">
+              Logout
+            </ion-item>
           </ion-list>
         </ion-content>
       </ion-menu>
@@ -34,4 +41,13 @@ import { IonContent, IonHeader, IonItem, IonList, IonMenu, IonMenuButton, IonRou
     </ion-split-pane>
   `,
 })
-export class AdminLayoutPage {}
+export class AdminLayoutPage {
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigateByUrl('/home');
+  }
+}
+

@@ -4,7 +4,7 @@ import { catchError, map, Observable, of } from 'rxjs';
 import { Product } from '../../shared/models/app.models';
 import { environment } from '../../../environments/environment';
 import { ApiResponse, PaginatedResult } from './api.models';
-import { MOCK_PRODUCTS } from '../../shared/data/mock-data';
+
 
 export interface ProductQueryParams {
   categorySlug?: string | null;
@@ -39,7 +39,7 @@ export class ProductService {
       return this.fetchProducts({
         ...params,
         page: 1,
-        limit: 200,
+        limit: 100,
       }).pipe(
         map((products) => {
           const start = (page - 1) * limit;
@@ -85,15 +85,13 @@ export class ProductService {
         pagination: response.data.pagination,
       })),
       catchError(() => {
-        const filtered = this.applyClientFilters(MOCK_PRODUCTS, params);
-        const start = (page - 1) * limit;
         return of({
-          items: filtered.slice(start, start + limit),
+          items: [],
           pagination: {
             page,
             limit,
-            total: filtered.length,
-            totalPages: Math.max(1, Math.ceil(filtered.length / limit)),
+            total: 0,
+            totalPages: 1,
           },
         });
       }),
@@ -126,7 +124,7 @@ export class ProductService {
     return this.http.get<ApiResponse<PaginatedResult<any>>>(this.baseUrl, { params: httpParams }).pipe(
       map((response) => response.data.items.map((product) => this.mapProduct(product))),
       map((products) => this.applyClientFilters(products, params)),
-      catchError(() => of(this.applyClientFilters(MOCK_PRODUCTS, params))),
+      catchError(() => of([])),
     );
   }
 

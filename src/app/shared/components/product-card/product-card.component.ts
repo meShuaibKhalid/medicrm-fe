@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { IonBadge, IonButton, IonCard, IonCardContent, IonIcon, IonImg } from '@ionic/angular/standalone';
 import { Product } from '../../models/app.models';
 import { PriceDisplayComponent } from '../price-display/price-display.component';
+import { WishlistService } from 'src/app/core/services/wishlist.service';
 
 @Component({
   selector: 'app-product-card',
@@ -10,8 +11,8 @@ import { PriceDisplayComponent } from '../price-display/price-display.component'
   imports: [CommonModule, IonBadge, IonButton, IonCard, IonCardContent, IonIcon, IonImg, PriceDisplayComponent],
   template: `
     <ion-card class="product-card soft-card">
-      <button class="wishlist-btn" type="button">
-        <ion-icon name="heart-outline"></ion-icon>
+      <button class="wishlist-btn" type="button" (click)="toggleWishlist($event)">
+        <ion-icon [name]="isInWishlist() ? 'heart' : 'heart-outline'"></ion-icon>
       </button>
       <div class="thumb" (click)="openProduct.emit(product)">
         <ion-img [src]="product.image" [alt]="product.title"></ion-img>
@@ -85,15 +86,15 @@ import { PriceDisplayComponent } from '../price-display/price-display.component'
          padding: 10px;
         cursor: pointer;
         overflow: hidden;
-        border: 1px solid #dadada;
-        border-radius: 8px;
+        border: 1px solid var(--color-soft-blue-gray);
+        border-radius: var(--app-border-radius-small, 8px);
         position: relative;
           button{
          font-size: 25px;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #bb5a77;
+    background: var(--ion-color-primary);
     position: absolute;
     bottom: 5px;
     right: 5px;
@@ -161,4 +162,25 @@ export class ProductCardComponent {
   @Input({ required: true }) product!: Product;
   @Output() addToCart = new EventEmitter<Product>();
   @Output() openProduct = new EventEmitter<Product>();
+
+  ngOnChanges(){
+    if (this.product?.image?.includes('dvago-logo.svg')) {
+      this.product.image = '/assets/logo.png'
+    }
+  }
+
+  wishlistService = inject(WishlistService);
+
+  isInWishlist(): boolean {
+    return this.wishlistService.getCurrentWishlist().items.some(item => item.product.id === this.product.id);
+  }
+
+  toggleWishlist(event: Event) {
+    event.stopPropagation();
+    if (this.isInWishlist()) {
+      this.wishlistService.removeItem(this.product.id);
+    } else {
+      this.wishlistService.addItem(this.product);
+    }
+  }
 }

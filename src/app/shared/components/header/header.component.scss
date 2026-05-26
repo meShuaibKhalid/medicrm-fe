@@ -1,15 +1,15 @@
 // Variables
-$primary-color: #0d9488; // Teal-ish, adjust to Dvago's brand colors
-$text-color: #333;
-$light-bg: #f3f4f6;
-$border-color: #e5e7eb;
+$primary-color: var(--ion-color-primary);
+$text-color: var(--color-navy-black);
+$light-bg: var(--color-ice-blue);
+$border-color: var(--color-soft-blue-gray);
 
 .main-header {
   position: relative;
   z-index: 1000;
-  background-color: #ffffff;
+  background-color: var(--color-white-near-white);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  font-family: 'Inter', 'Roboto', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 .header-top {
@@ -170,7 +170,7 @@ $border-color: #e5e7eb;
 
 /* Category Navigation Row */
 .header-bottom {
-  background-color: #ffffff;
+  background-color: var(--color-white-near-white);
 }
 
 .category-nav {
@@ -228,9 +228,9 @@ $border-color: #e5e7eb;
   left: 0;
   width: max-content;
   min-width: 220px;
-  background-color: #ffffff;
+  background-color: var(--color-white-near-white);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: var(--app-border-radius, 12px);
   border: 1px solid $border-color;
   z-index: 1010;
   animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -267,7 +267,7 @@ $border-color: #e5e7eb;
         }
 
         &:hover, &:focus {
-          background-color: #f3f4f6;
+          background-color: var(--color-ice-blue);
           color: $primary-color;
           .sub-chevron {
             color: $primary-color;
@@ -290,9 +290,9 @@ $border-color: #e5e7eb;
   left: 100%;
   width: max-content;
   min-width: 220px;
-  background-color: #ffffff;
+  background-color: var(--color-white-near-white);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  border-radius: var(--app-border-radius, 12px);
   border: 1px solid $border-color;
   z-index: 1020;
   animation: slideRight 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;

@@ -24,7 +24,7 @@ import { IonBadge } from '@ionic/angular/standalone';
         -webkit-box-orient: vertical;
         overflow: hidden;
         text-transform: capitalize; 
-            color: #bb5a77;
+            color: var(--ion-color-primary);
     font-weight: 700;
     font-size: .9rem;
     transform: translateY(2px);

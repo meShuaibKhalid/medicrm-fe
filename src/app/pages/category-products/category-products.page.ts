@@ -76,17 +76,17 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
       display: flex;
       gap: 10px;
       align-items: center;
-      color: #b6667d;
+      color: var(--ion-color-primary);
       font-size: 1rem;
       margin: 10px 0 22px;
     }
     .dvago-outlined-chip {
       min-width: max-content;
       padding: 7px 9px;
-      border: 1px solid #e3e6ef;
-      border-radius: 7px;
-      background: #fff;
-      color: #303030;
+      border: 1px solid var(--color-soft-blue-gray);
+      border-radius: var(--app-border-radius-small, 8px);
+      background: var(--color-white-near-white);
+      color: var(--color-navy-black);
       font-size: 0.75rem;
     }
     .filters-card {

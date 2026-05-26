@@ -27,7 +27,7 @@ import { OrderStatusBadgeComponent } from '../../../shared/components/order-stat
         </ion-card>
         <ion-list class="soft-card">
           <ion-item *ngFor="let item of order.items">
-            <ion-label>{{ item.product.title }} · {{ item.quantity }} x Rs. {{ (item.salePrice ?? item.price) | number:'1.0-2' }}</ion-label>
+            <ion-label>{{ item.title }} · {{ item.quantity }} x Rs. {{ (item.salePrice ?? item.price) | number:'1.0-2' }}</ion-label>
           </ion-item>
         </ion-list>
         <ion-card class="soft-card">
@@ -40,9 +40,8 @@ import { OrderStatusBadgeComponent } from '../../../shared/components/order-stat
           </ion-card-content>
         </ion-card>
         <div class="actions">
-          <ion-button expand="block" shape="round" [disabled]="!canDispatch" (click)="updateStatus('dispatched')">Dispatch Order</ion-button>
-          <ion-button expand="block" shape="round" color="success" [disabled]="!canComplete" (click)="updateStatus('completed')">Mark Completed</ion-button>
-          <ion-button expand="block" shape="round" color="danger" fill="outline" [disabled]="!canCancel" (click)="updateStatus('cancelled')">Cancel Order</ion-button>
+          <ion-button expand="block" shape="round" color="success" [disabled]="!canComplete" (click)="updateStatus('Done')">Mark Done</ion-button>
+          <ion-button expand="block" shape="round" color="danger" fill="outline" [disabled]="!canCancel" (click)="updateStatus('Cancelled')">Cancel Order</ion-button>
         </div>
       </div>
     </ion-content>
@@ -57,22 +56,18 @@ export class AdminOrderDetailPage {
   constructor() {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id') ?? '';
-      this.adminService.getOrders().subscribe((orders) => {
-        this.order = orders.find((item) => item.id === id);
+      this.adminService.getOrders().subscribe((res:any) => {
+        this.order = res.items.find((item:any) => item.id === id);
       });
     });
   }
 
-  get canDispatch(): boolean {
-    return !!this.order && !['completed', 'cancelled', 'dispatched'].includes(this.order.status);
-  }
-
   get canComplete(): boolean {
-    return !!this.order && !['completed', 'cancelled'].includes(this.order.status);
+    return !!this.order && !['Done', 'Cancelled'].includes(this.order.status);
   }
 
   get canCancel(): boolean {
-    return !!this.order && this.order.status !== 'completed' && this.order.status !== 'cancelled';
+    return !!this.order && this.order.status !== 'Done' && this.order.status !== 'Cancelled';
   }
 
   updateStatus(status: Order['status']): void {

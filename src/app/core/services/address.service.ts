@@ -1,14 +1,71 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap, map, catchError } from 'rxjs/operators';
 import { Address } from '../../shared/models/app.models';
-import { MOCK_ADDRESSES } from '../../shared/data/mock-data';
+import { AuthService } from './auth.service';
+import { environment } from '../../../environments/environment';
+
+export interface AddressResponse {
+  success: boolean;
+  message: string;
+  data: any;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AddressService {
-  private readonly addressesSubject = new BehaviorSubject<Address[]>([...MOCK_ADDRESSES]);
+  private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
+  private readonly apiUrl = `${environment.apiUrl}/users/me/addresses`;
+  private readonly addressesSubject = new BehaviorSubject<Address[]>([]);
   readonly addresses$ = this.addressesSubject.asObservable();
 
+  constructor() {
+    this.authService.currentUser$.subscribe((user) => {
+      if (user) {
+        this.loadAddresses();
+      } else {
+        this.addressesSubject.next([]);
+      }
+    });
+  }
+
+  loadAddresses(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.http.get<AddressResponse>(this.apiUrl).pipe(
+        map((res) => {
+          if (res.success && Array.isArray(res.data)) {
+            return res.data.map((addr) => this.mapBackendAddress(addr));
+          }
+          return [];
+        }),
+        catchError(() => of([]))
+      ).subscribe((addrs) => {
+        this.addressesSubject.next(addrs);
+      });
+    } else {
+      this.addressesSubject.next([]);
+    }
+  }
+
+  private mapBackendAddress(addr: any): Address {
+    return {
+      id: addr._id || addr.id,
+      fullName: addr.fullName,
+      phone: addr.phone,
+      city: addr.city,
+      area: addr.area,
+      addressLine: addr.addressLine,
+      nearestLandmark: addr.nearestLandmark || '',
+      latitude: addr.latitude || 0,
+      longitude: addr.longitude || 0,
+      isDefault: addr.isDefault || false,
+    };
+  }
+
   getAddresses() {
+    this.loadAddresses();
     return this.addresses$;
   }
 
@@ -17,49 +74,41 @@ export class AddressService {
   }
 
   addAddress(address: Omit<Address, 'id'>) {
-    const next = [...this.addressesSubject.value, { ...address, id: `addr-${Date.now()}` }];
-    this.addressesSubject.next(this.normalizeDefault(next));
-    return of(true);
+    const payload = {
+      ...address,
+      latitude: address.latitude || 0,
+      longitude: address.longitude || 0,
+    };
+    return this.http.post<AddressResponse>(this.apiUrl, payload).pipe(
+      tap(() => this.loadAddresses())
+    );
   }
 
   updateAddress(updated: Address) {
-    const next = this.addressesSubject.value.map((address) => address.id === updated.id ? updated : address);
-    this.addressesSubject.next(this.normalizeDefault(next));
-    return of(true);
+    const payload = {
+      ...updated,
+      latitude: updated.latitude || 0,
+      longitude: updated.longitude || 0,
+    };
+    return this.http.patch<AddressResponse>(`${this.apiUrl}/${updated.id}`, payload).pipe(
+      tap(() => this.loadAddresses())
+    );
   }
 
   deleteAddress(id: string) {
-    const next = this.addressesSubject.value.filter((address) => address.id !== id);
-    this.addressesSubject.next(this.normalizeDefault(next));
-    return of(true);
+    return this.http.delete<AddressResponse>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.loadAddresses())
+    );
   }
 
   setDefaultAddress(id: string) {
-    const next = this.addressesSubject.value.map((address) => ({ ...address, isDefault: address.id === id }));
-    this.addressesSubject.next(next);
-    return of(true);
+    return this.http.patch<AddressResponse>(`${this.apiUrl}/${id}/default`, {}).pipe(
+      tap(() => this.loadAddresses())
+    );
   }
 
   getDefaultAddress(): Address | undefined {
     return this.addressesSubject.value.find((address) => address.isDefault);
   }
-
-  private normalizeDefault(addresses: Address[]): Address[] {
-    if (!addresses.length) {
-      return addresses;
-    }
-
-    if (!addresses.some((address) => address.isDefault)) {
-      return addresses.map((address, index) => ({ ...address, isDefault: index === 0 }));
-    }
-
-    let defaultFound = false;
-    return addresses.map((address) => {
-      if (address.isDefault && !defaultFound) {
-        defaultFound = true;
-        return address;
-      }
-      return { ...address, isDefault: false };
-    });
-  }
 }
+

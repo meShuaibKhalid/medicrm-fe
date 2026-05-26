@@ -14,7 +14,7 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
     <ion-content>
       <div class="page-shell">
         <ion-list class="soft-card">
-          <ion-item *ngFor="let order of orders">
+          <ion-item *ngFor="let order of orders$ | async">
             <ion-label>
               <h2>{{ order.orderNumber }}</h2>
               <p>{{ order.createdAt | date:'mediumDate' }}</p>
@@ -30,5 +30,9 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
 })
 export class OrdersPage {
   private readonly orderService = inject(OrderService);
-  orders = this.orderService.getCurrentOrders();
+  orders$ = this.orderService.getMyOrders();
+
+  ngOnInit() {
+    this.orderService.fetchMyOrders().subscribe();
+  }
 }

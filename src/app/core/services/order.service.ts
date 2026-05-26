@@ -1,34 +1,41 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { Cart, Order, OrderStatus } from '../../shared/models/app.models';
-import { MOCK_ORDERS } from '../../shared/data/mock-data';
-import { AuthService } from './auth.service';
+import { tap, map } from 'rxjs/operators';
+import { Order, OrderStatus } from '../../shared/models/app.models';
+import { environment } from '../../../environments/environment';
+import { ApiResponse } from './api.models';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
-  private readonly authService = inject(AuthService);
-  private readonly ordersSubject = new BehaviorSubject<Order[]>([...MOCK_ORDERS]);
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/orders`;
+  
+  private readonly ordersSubject = new BehaviorSubject<Order[]>([]);
   readonly orders$ = this.ordersSubject.asObservable();
   private latestOrder: Order | null = null;
 
-  createOrder(cart: Cart, address: Order['address']): Observable<Order> {
-    const order: Order = {
-      id: `ord-${Date.now()}`,
-      orderNumber: `DVG-${Math.floor(10000 + Math.random() * 90000)}`,
-      status: 'pending',
-      paymentMethod: 'Cash on Delivery',
-      user: this.authService.getCurrentUserSnapshot() ?? undefined,
-      items: cart.items,
-      address,
-      subtotal: cart.subtotal,
-      discountTotal: cart.discountTotal,
-      deliveryFee: cart.deliveryFee,
-      grandTotal: cart.grandTotal,
-      createdAt: new Date().toISOString(),
-    };
-    this.ordersSubject.next([order, ...this.ordersSubject.value]);
-    this.latestOrder = order;
-    return of(order);
+  createOrder(payload: { addressId: string, customerNote?: string, prescriptionUrl?: string }): Observable<Order> {
+    return this.http.post<ApiResponse<Order>>(`${this.apiUrl}`, payload).pipe(
+      map(res => {
+        const order = res.data;
+        if (order._id && !order.id) {
+          order.id = order._id;
+        }
+        return order;
+      }),
+      tap(order => {
+        this.ordersSubject.next([order, ...this.ordersSubject.value]);
+        this.latestOrder = order;
+      })
+    );
+  }
+
+  fetchMyOrders(): Observable<Order[]> {
+    return this.http.get<ApiResponse<Order[]>>(`${this.apiUrl}/my`).pipe(
+      map(res => res.data.map(o => ({ ...o, id: o._id || o.id }))),
+      tap(orders => this.ordersSubject.next(orders))
+    );
   }
 
   getMyOrders(): Observable<Order[]> {
@@ -39,24 +46,24 @@ export class OrderService {
     return this.ordersSubject.value;
   }
 
-  getOrderById(id: string): Observable<Order | undefined> {
-    return of(this.ordersSubject.value.find((order) => order.id === id));
+  getOrderById(id: string): Observable<Order> {
+    // Optimistic cache check
+    const existing = this.ordersSubject.value.find(o => o.id === id);
+    if (existing) {
+      return of(existing);
+    }
+    return this.http.get<ApiResponse<Order>>(`${this.apiUrl}/${id}`).pipe(
+      map(res => {
+        const order = res.data;
+        if (order._id && !order.id) {
+          order.id = order._id;
+        }
+        return order;
+      })
+    );
   }
 
   getLatestOrder(): Order | null {
     return this.latestOrder;
-  }
-
-  updateOrderStatus(id: string, status: OrderStatus): Observable<Order | undefined> {
-    let updated: Order | undefined;
-    const next = this.ordersSubject.value.map((order) => {
-      if (order.id !== id) {
-        return order;
-      }
-      updated = { ...order, status };
-      return updated;
-    });
-    this.ordersSubject.next(next);
-    return of(updated);
   }
 }

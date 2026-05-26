@@ -1,12 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { forkJoin, map, Observable, of } from 'rxjs';
 import { Category, Order, OrderStatus, Product, User } from '../../shared/models/app.models';
-import { MOCK_CATEGORIES } from '../../shared/data/mock-data';
 import { ProductService } from './product.service';
 import { OrderService } from './order.service';
 import { environment } from '../../../environments/environment';
-import { ApiResponse } from './api.models';
+import { ApiResponse, PaginatedResult } from './api.models';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -16,27 +15,23 @@ export class AdminService {
   private readonly baseUrl = `${environment.apiUrl}/admin`;
 
   getDashboardStats(): Observable<{ label: string; value: number }[]> {
-    return forkJoin({
-      products: this.productService.getProducts(),
-      orders: this.getOrders(),
-      users: this.getUsers(),
-    }).pipe(
-      map(({ products, orders, users }) => {
-        return [
-          { label: 'Total products', value: products.length },
-          { label: 'Total orders', value: orders.length },
-          { label: 'Pending orders', value: orders.filter((order) => order.status === 'pending').length },
-          { label: 'Completed orders', value: orders.filter((order) => order.status === 'completed').length },
-          { label: 'Total users', value: users.filter((user) => user.role === 'user').length },
-          { label: 'Low stock products', value: products.filter((product) => product.stock < 20).length },
-        ];
-      })
+    return this.http.get<ApiResponse<{ label: string; value: number }[]>>(`${this.baseUrl}/stats`).pipe(
+      map((res) => res.data)
     );
   }
 
-  getUsers(): Observable<User[]> {
-    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/users`).pipe(
-      map((res) => res.data.map((u: any) => ({ ...u, id: u._id || u.id })))
+  getUsers(params?: { search?: string; page?: number; limit?: number }): Observable<PaginatedResult<User>> {
+    let httpParams = new HttpParams()
+      .set('page', String(params?.page ?? 1))
+      .set('limit', String(params?.limit ?? 20));
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    return this.http.get<ApiResponse<PaginatedResult<any>>>(`${this.baseUrl}/users`, { params: httpParams }).pipe(
+      map((res) => ({
+        items: res.data.items.map((u: any) => ({ ...u, id: u._id || u.id })),
+        pagination: res.data.pagination,
+      }))
     );
   }
 
@@ -44,9 +39,55 @@ export class AdminService {
     return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/users/${id}/status`, { isActive }).pipe(map(() => true));
   }
 
-  getOrders(): Observable<Order[]> {
-    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/orders`).pipe(
-      map((res) => res.data.map((o: any) => ({ ...o, id: o._id || o.id })))
+  deleteUser(id: string): Observable<boolean> {
+    return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/users/${id}`).pipe(map(() => true));
+  }
+
+  getOrders(params?: { search?: string; status?: string; page?: number; limit?: number }): Observable<PaginatedResult<Order>> {
+    let httpParams = new HttpParams()
+      .set('page', String(params?.page ?? 1))
+      .set('limit', String(params?.limit ?? 20));
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    if (params?.status) {
+      httpParams = httpParams.set('status', params.status);
+    }
+    return this.http.get<ApiResponse<PaginatedResult<any>>>(`${this.baseUrl}/orders`, { params: httpParams }).pipe(
+      map((res) => ({
+        items: res.data.items.map((o: any) => ({ ...o, id: o._id || o.id })),
+        pagination: res.data.pagination,
+      }))
+    );
+  }
+
+  getAdminProducts(params?: { search?: string; page?: number; limit?: number }): Observable<PaginatedResult<Product>> {
+    let httpParams = new HttpParams()
+      .set('page', String(params?.page ?? 1))
+      .set('limit', String(params?.limit ?? 20));
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    return this.http.get<ApiResponse<PaginatedResult<any>>>(`${this.baseUrl}/products`, { params: httpParams }).pipe(
+      map((res) => ({
+        items: res.data.items.map((p: any) => ({ ...p, id: p._id || p.id })),
+        pagination: res.data.pagination,
+      }))
+    );
+  }
+
+  getAdminCategories(params?: { search?: string; page?: number; limit?: number }): Observable<PaginatedResult<Category>> {
+    let httpParams = new HttpParams()
+      .set('page', String(params?.page ?? 1))
+      .set('limit', String(params?.limit ?? 20));
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    return this.http.get<ApiResponse<PaginatedResult<any>>>(`${this.baseUrl}/categories`, { params: httpParams }).pipe(
+      map((res) => ({
+        items: res.data.items.map((c: any) => ({ ...c, id: c._id || c.id })),
+        pagination: res.data.pagination,
+      }))
     );
   }
 
@@ -57,26 +98,34 @@ export class AdminService {
   }
 
   createProduct(product: Product): Observable<Product> {
-    return of(product);
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/products`, product).pipe(
+      map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
+    );
   }
 
   updateProduct(product: Product): Observable<Product> {
-    return of(product);
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/products/${product.id}`, product).pipe(
+      map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
+    );
   }
 
   deleteProduct(_id: string): Observable<boolean> {
-    return of(true);
+    return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/products/${_id}`).pipe(map(() => true));
   }
 
   createCategory(category: Category): Observable<Category> {
-    return of(category);
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/categories`, category).pipe(
+      map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
+    );
   }
 
   updateCategory(category: Category): Observable<Category> {
-    return of(category);
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/categories/${category.id}`, category).pipe(
+      map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
+    );
   }
 
   deleteCategory(_id: string): Observable<boolean> {
-    return of(true);
+    return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/categories/${_id}`).pipe(map(() => true));
   }
 }

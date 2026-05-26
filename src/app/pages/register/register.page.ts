@@ -12,7 +12,7 @@ import { CartService } from '../../core/services/cart.service';
   standalone: true,
   imports: [FormsModule, RouterLink, IonButton, IonContent, IonCheckbox, IonLabel],
   styles: [`
-    :host { --ion-background-color: #faf5f7; }
+    :host { --ion-background-color: var(--color-ice-blue); }
 
     .page {
       min-height: 100vh;
@@ -20,28 +20,29 @@ import { CartService } from '../../core/services/cart.service';
       align-items: center;
       justify-content: center;
       padding: 2rem 1rem;
-      background: #faf5f7;
-      font-family: 'DM Sans', sans-serif;
+      background: var(--color-ice-blue);
+      font-family: 'Poppins', sans-serif;
     }
 
     .card {
-      background: #ffffff;
-      border-radius: 24px;
+      background: var(--color-white-near-white);
+      border-radius: var(--app-border-radius-large, 18px);
       padding: 2.5rem 2rem 2rem;
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 8px 40px rgba(180,60,100,0.10), 0 1px 4px rgba(0,0,0,0.04);
+      box-shadow: 0 8px 40px rgba(12,20,39,0.06), 0 1px 4px rgba(0,0,0,0.04);
       display: flex;
       flex-direction: column;
       align-items: center;
+      border: 1px solid var(--color-soft-blue-gray);
     }
 
     .logo-wrap {
       width: 68px;
       height: 68px;
       border-radius: 50%;
-      background: #fff0f5;
-      border: 2.5px solid #f9c2d4;
+      background: var(--color-pale-mint);
+      border: 2.5px solid var(--ion-color-primary);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -51,13 +52,13 @@ import { CartService } from '../../core/services/cart.service';
     h1 {
       font-size: 26px;
       font-weight: 700;
-      color: #2a1a22;
+      color: var(--color-navy-black);
       margin: 0 0 0.35rem;
     }
 
     .subtitle {
       font-size: 14px;
-      color: #9a7a88;
+      color: var(--color-slate-gray);
       margin-bottom: 1.75rem;
     }
 
@@ -70,21 +71,21 @@ import { CartService } from '../../core/services/cart.service';
 
     .field {
       width: 100%;
-      border: 1.5px solid #ebd5de;
-      border-radius: 12px;
+      border: 1.5px solid var(--color-soft-blue-gray);
+      border-radius: var(--app-border-radius, 12px);
       padding: 0.8rem 1rem;
       font-size: 14px;
-      color: #2a1a22;
-      background: #fdfafb;
+      color: var(--color-navy-black);
+      background: var(--color-white-near-white);
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .field::placeholder { color: #c4a0b0; }
+    .field::placeholder { color: var(--color-blue-gray); }
     .field:focus {
-      border-color: #d45a85;
-      box-shadow: 0 0 0 3px rgba(212,90,133,0.10);
-      background: #fff;
+      border-color: var(--ion-color-primary);
+      box-shadow: 0 0 0 3px rgba(14,168,125,0.10);
+      background: var(--color-white-near-white);
     }
 
     .checkbox-row {
@@ -95,43 +96,43 @@ import { CartService } from '../../core/services/cart.service';
 
     .checkbox-label {
       font-size: 13px;
-      color: #7a5568;
+      color: var(--color-slate-gray);
       line-height: 1.5;
     }
 
     .btn-send {
       width: 100%;
       padding: 0.9rem;
-      background: #c94c7e;
+      background: var(--ion-color-primary);
       color: #fff;
       font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.08em;
       border: none;
-      border-radius: 12px;
+      border-radius: var(--app-border-radius, 12px);
       cursor: pointer;
       text-transform: uppercase;
       margin-top: 0.4rem;
       transition: background 0.18s;
     }
 
-    .btn-send:hover { background: #b33f6c; }
+    .btn-send:hover { background: var(--color-fresh-green); }
 
     .divider {
       width: 100%;
       height: 1px;
-      background: #f0e0e8;
+      background: var(--color-soft-blue-gray);
       margin: 1rem 0 0.6rem;
     }
 
     .footer-link {
       font-size: 13px;
-      color: #9a7a88;
+      color: var(--color-slate-gray);
       text-align: center;
     }
 
     .footer-link a {
-      color: #c94c7e;
+      color: var(--ion-color-primary);
       font-weight: 500;
       text-decoration: none;
     }

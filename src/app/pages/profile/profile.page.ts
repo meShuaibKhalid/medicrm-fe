@@ -9,30 +9,30 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, AsyncPipe, IonIcon, IonButton, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar],
   styles: [`
-    :host { --ion-background-color: #faf5f7; }
+    :host { --ion-background-color: var(--color-ice-blue); }
 
     .header-title {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       font-weight: 700;
-      color: #2a1a22;
+      color: var(--color-navy-black);
     }
 
     .profile-container {
       padding: 1.5rem 1rem;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
       max-width: 600px;
       margin: 0 auto;
     }
 
     .user-card {
-      background: linear-gradient(135deg, #d45a85 0%, #b33f6c 100%);
-      border-radius: 20px;
+      background: linear-gradient(135deg, var(--ion-color-primary) 0%, var(--color-fresh-green) 100%);
+      border-radius: var(--app-border-radius-large, 18px);
       padding: 2rem 1.5rem;
       color: #fff;
       display: flex;
       align-items: center;
       gap: 1.5rem;
-      box-shadow: 0 10px 30px rgba(212, 90, 133, 0.3);
+      box-shadow: 0 10px 30px rgba(14, 168, 125, 0.3);
       margin-bottom: 2rem;
     }
 
@@ -46,7 +46,7 @@ import { AuthService } from '../../core/services/auth.service';
       justify-content: center;
       font-size: 28px;
       font-weight: 700;
-      color: #d45a85;
+      color: var(--ion-color-primary);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
@@ -64,11 +64,12 @@ import { AuthService } from '../../core/services/auth.service';
     }
 
     .menu-card {
-      background: #fff;
-      border-radius: 20px;
+      background: var(--color-white-near-white);
+      border-radius: var(--app-border-radius-large, 18px);
       padding: 0.5rem;
       box-shadow: 0 4px 16px rgba(0,0,0,0.04);
       margin-bottom: 1.5rem;
+      border: 1px solid var(--color-soft-blue-gray);
     }
 
     ion-item {
@@ -76,17 +77,17 @@ import { AuthService } from '../../core/services/auth.service';
       --inner-padding-end: 1rem;
       --background: transparent;
       font-weight: 500;
-      color: #2a1a22;
-      border-radius: 12px;
+      color: var(--color-navy-black);
+      border-radius: var(--app-border-radius, 12px);
       margin: 0.2rem 0;
     }
 
     ion-item::part(native):hover {
-      background: #fdfafb;
+      background: var(--color-ice-blue);
     }
 
     ion-icon {
-      color: #d45a85;
+      color: var(--ion-color-primary);
       margin-right: 12px;
       font-size: 20px;
     }
@@ -94,19 +95,19 @@ import { AuthService } from '../../core/services/auth.service';
     .logout-btn {
       width: 100%;
       padding: 1rem;
-      background: #fff;
-      color: #d45a85;
+      background: var(--color-white-near-white);
+      color: var(--ion-color-primary);
       font-size: 15px;
       font-weight: 700;
-      border: 2px solid #f0e0e8;
-      border-radius: 16px;
+      border: 2px solid var(--color-soft-blue-gray);
+      border-radius: var(--app-border-radius, 12px);
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .logout-btn:hover {
-      background: #fff0f5;
-      border-color: #f9c2d4;
+      background: var(--color-pale-mint);
+      border-color: var(--ion-color-primary);
     }
   `],
   template: `

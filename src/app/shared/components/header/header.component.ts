@@ -1,16 +1,21 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { Subscription, Observable } from 'rxjs';
+import { Subscription, Observable, map } from 'rxjs';
 import { CategoryService } from '../../../core/services/category.service';
-import { Category } from '../../../shared/models/app.models';
+import { AuthService } from '../../../core/services/auth.service';
+import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
+import { AddressService } from '../../../core/services/address.service';
+import { Category, Address } from '../../../shared/models/app.models';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule],
+  imports: [CommonModule, IonicModule, RouterModule, FormsModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
@@ -18,8 +23,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
   showHeader = true;
   private routerSub!: Subscription;
   private categoryService = inject(CategoryService);
+  private authService = inject(AuthService);
+  private cartService = inject(CartService);
+  private wishlistService = inject(WishlistService);
+  private addressService = inject(AddressService);
   
-  categories$: Observable<Category[]> = this.categoryService.getCategoryTree();
+  categories$ = this.categoryService.getCategoryTree();
+  currentUser$ = this.authService.currentUser$;
+  cart$ = this.cartService.cart$;
+  wishlist$ = this.wishlistService.wishlist$;
+  addresses$ = this.addressService.addresses$;
+  defaultAddress$ = this.addressService.addresses$.pipe(
+    map((addrs) => addrs.find((a) => a.isDefault) || addrs[0])
+  );
 
   constructor(private router: Router) {}
 
@@ -79,5 +95,27 @@ export class HeaderComponent implements OnInit, OnDestroy {
         dropdown.style.top = `${adjustedTop}px`;
       }
     }, 10);
+  }
+
+  goToProfile(): void {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigateByUrl('/profile');
+    } else {
+      this.router.navigateByUrl('/login');
+    }
+  }
+
+  selectAddress(id: any): void {
+    this.addressService.setDefaultAddress(id).subscribe();
+  }
+
+  isLoggedIn(): boolean {
+    return this.authService.isLoggedIn();
+  }
+
+  onLocationClick(): void {
+    if (!this.isLoggedIn()) {
+      this.router.navigateByUrl('/login');
+    }
   }
 }

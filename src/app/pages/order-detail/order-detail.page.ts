@@ -25,7 +25,7 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
         <ion-list class="soft-card">
           <ion-item *ngFor="let item of order.items">
             <ion-label>
-              <h3>{{ item.product.title }}</h3>
+              <h3>{{ item.title }}</h3>
               <p>{{ item.quantity }} x Rs. {{ (item.salePrice ?? item.price) | number:'1.0-2' }}</p>
             </ion-label>
           </ion-item>

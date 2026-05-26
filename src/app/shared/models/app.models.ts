@@ -46,6 +46,15 @@ export interface Cart {
   grandTotal: number;
 }
 
+export interface WishlistItem {
+  product: Product;
+  addedAt: string;
+}
+
+export interface Wishlist {
+  items: WishlistItem[];
+}
+
 export interface Address {
   id: string;
   fullName: string;
@@ -59,16 +68,26 @@ export interface Address {
   isDefault: boolean;
 }
 
-export type OrderStatus = 'pending' | 'confirmed' | 'dispatched' | 'completed' | 'cancelled';
+export type OrderStatus = 'Pending' | 'Done' | 'Cancelled';
+
+export interface OrderItem {
+  productId: string;
+  title: string;
+  quantity: number;
+  price: number;
+  salePrice?: number;
+  lineTotal: number;
+}
 
 export interface Order {
   id: string;
+  _id?: string;
   orderNumber: string;
   status: OrderStatus;
   paymentMethod: string;
-  user?: User;
-  items: CartItem[];
-  address: Address;
+  user?: Partial<User>;
+  items: OrderItem[];
+  address: Partial<Address>;
   subtotal: number;
   discountTotal: number;
   deliveryFee: number;

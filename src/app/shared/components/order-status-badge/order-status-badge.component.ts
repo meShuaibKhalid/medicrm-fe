@@ -14,13 +14,11 @@ export class OrderStatusBadgeComponent {
 
   get color(): string {
     switch (this.status) {
-      case 'completed':
+      case 'Done':
         return 'success';
-      case 'cancelled':
+      case 'Cancelled':
         return 'danger';
-      case 'confirmed':
-        return 'secondary';
-      case 'dispatched':
+      case 'Pending':
         return 'warning';
       default:
         return 'medium';

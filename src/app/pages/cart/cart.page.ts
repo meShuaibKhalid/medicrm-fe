@@ -22,36 +22,38 @@ import { ProductService } from 'src/app/core/services/product.service';
         <ion-icon name="chevron-forward-outline"></ion-icon>
         <span>Cart</span>
       </div>
-      <ng-container *ngIf="cart.items.length; else emptyCart">
+      <ng-container *ngIf="cart$ | async as cart">
+        <ng-container *ngIf="cart.items.length; else emptyCart">
 
-        <div class="cart-list">
-          <div class="cart-item" *ngFor="let item of cart.items">
-            <div class="item-info">
-              <p class="item-title">{{ item.product.title }}</p>
-              <p class="item-brand">{{ item.product.brand }}</p>
-              <app-price-display [price]="item.price" [salePrice]="item.salePrice" [salePercent]="item.product.salePercent"></app-price-display>
-            </div>
-            <div class="qty-row">
-              <div class="qty-controls">
-                <button class="qty-btn" (click)="cartService.updateQuantity(item.product.id, item.quantity - 1)">-</button>
-                <span class="qty-val">{{ item.quantity }}</span>
-                <button class="qty-btn" (click)="cartService.updateQuantity(item.product.id, item.quantity + 1)">+</button>
+          <div class="cart-list">
+            <div class="cart-item" *ngFor="let item of cart.items">
+              <div class="item-info">
+                <p class="item-title">{{ item.product.title }}</p>
+                <p class="item-brand">{{ item.product.brand }}</p>
+                <app-price-display [price]="item.price" [salePrice]="item.salePrice" [salePercent]="item.product.salePercent"></app-price-display>
               </div>
-              <button class="remove-btn" (click)="cartService.removeItem(item.product.id)">Remove</button>
+              <div class="qty-row">
+                <div class="qty-controls">
+                  <button class="qty-btn" (click)="cartService.updateQuantity(item.product.id, item.quantity - 1)">-</button>
+                  <span class="qty-val">{{ item.quantity }}</span>
+                  <button class="qty-btn" (click)="cartService.updateQuantity(item.product.id, item.quantity + 1)">+</button>
+                </div>
+                <button class="remove-btn" (click)="cartService.removeItem(item.product.id)">Remove</button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="totals-card">
-          <div class="totals-lines">
-            <div class="line"><span>Subtotal</span><span>Rs. {{ cart.subtotal | number:'1.0-2' }}</span></div>
-            <div class="line"><span>Discount</span><span>- Rs. {{ cart.discountTotal | number:'1.0-2' }}</span></div>
-            <div class="line"><span>Delivery fee</span><span>Rs. {{ cart.deliveryFee | number:'1.0-2' }}</span></div>
-            <div class="line grand"><span>Grand total</span><span>Rs. {{ cart.grandTotal | number:'1.0-2' }}</span></div>
+          <div class="totals-card">
+            <div class="totals-lines">
+              <div class="line"><span>Subtotal</span><span>Rs. {{ cart.subtotal | number:'1.0-2' }}</span></div>
+              <div class="line"><span>Discount</span><span>- Rs. {{ cart.discountTotal | number:'1.0-2' }}</span></div>
+              <div class="line"><span>Delivery fee</span><span>Rs. {{ cart.deliveryFee | number:'1.0-2' }}</span></div>
+              <div class="line grand"><span>Grand total</span><span>Rs. {{ cart.grandTotal | number:'1.0-2' }}</span></div>
+            </div>
+            <button class="checkout-btn" routerLink="/checkout">PROCEED TO CHECKOUT</button>
           </div>
-          <button class="checkout-btn" routerLink="/checkout">PROCEED TO CHECKOUT</button>
-        </div>
 
+        </ng-container>
       </ng-container>
       <ng-template #emptyCart>
         <app-empty-state title="Your cart is empty" message="Add products to continue checkout." icon="bag-handle-outline"></app-empty-state>
@@ -59,7 +61,7 @@ import { ProductService } from 'src/app/core/services/product.service';
     </div>
   </ion-content>
 `,
-styles: [`
+  styles: [`
   .topbar {
       display: flex;
       gap: 12px;
@@ -137,15 +139,15 @@ styles: [`
     margin-left: 6px;
     height: fit-content;
     white-space: nowrap;
-    &.instant-btn{
-      background-color: #bb5a77 !important;
+    &.instant-btn {
+      background-color: var(--ion-color-primary) !important;
     }
-    &.action-btns{
-      button{
+    &.action-btns {
+      button {
         background: transparent;
       }
     }
-    ion-icon{
+    ion-icon {
       font-size: 25px;
       margin-right: 4px;
     }
@@ -157,7 +159,7 @@ styles: [`
       flex-direction: row;
       flex-wrap: nowrap;
       padding: 0 5px;
-      .category-list{
+      .category-list {
           display: flex;
           justify-content: center;
           align-items: unset;
@@ -178,7 +180,7 @@ styles: [`
       }
     }
 
-    :host { --ion-background-color: #faf5f7; }
+    :host { --ion-background-color: var(--color-ice-blue); }
 
     .cart-page {
       padding: 1rem;
@@ -187,7 +189,7 @@ styles: [`
       gap: 1.5rem;
       max-width: 800px;
       margin: 0 auto;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
 
     .dvago-breadcrumb {
@@ -195,7 +197,7 @@ styles: [`
       align-items: center;
       gap: 0.5rem;
       font-size: 13px;
-      color: #9a7a88;
+      color: var(--color-blue-gray);
       margin-bottom: 0.5rem;
     }
 
@@ -210,11 +212,11 @@ styles: [`
     }
 
     .cart-item {
-      background: #ffffff;
-      border-radius: 16px;
+      background: var(--color-white-near-white);
+      border-radius: var(--app-border-radius-large, 18px);
       padding: 1.25rem;
       box-shadow: 0 4px 16px rgba(0,0,0,0.03);
-      border: 1px solid #f0e0e8;
+      border: 1px solid var(--color-soft-blue-gray);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -222,7 +224,7 @@ styles: [`
     }
 
     .cart-item:hover {
-      box-shadow: 0 8px 24px rgba(180,60,100,0.06);
+      box-shadow: 0 8px 24px rgba(14,168,125,0.06);
     }
 
     .item-info {
@@ -233,14 +235,14 @@ styles: [`
       margin: 0 0 4px;
       font-size: 15px;
       font-weight: 700;
-      color: #2a1a22;
+      color: var(--color-navy-black);
       line-height: 1.4;
     }
 
     .item-brand {
       margin: 0 0 8px;
       font-size: 12px;
-      color: #9a7a88;
+      color: var(--color-blue-gray);
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -256,10 +258,10 @@ styles: [`
       display: flex;
       align-items: center;
       gap: 8px;
-      background: #fff0f5;
+      background: var(--color-pale-mint);
       border-radius: 20px;
       padding: 4px 6px;
-      border: 1px solid #f9c2d4;
+      border: 1px solid var(--color-soft-blue-gray);
     }
 
     .qty-btn {
@@ -267,8 +269,8 @@ styles: [`
       height: 28px;
       border: none;
       border-radius: 50%;
-      background: #ffffff;
-      color: #d45a85;
+      background: var(--color-white-near-white);
+      color: var(--ion-color-primary);
       font-size: 18px;
       font-weight: 600;
       line-height: 1;
@@ -276,7 +278,7 @@ styles: [`
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 6px rgba(212, 90, 133, 0.15);
+      box-shadow: 0 2px 6px rgba(14, 168, 125, 0.15);
       transition: transform 0.1s;
     }
 
@@ -289,13 +291,13 @@ styles: [`
       text-align: center;
       font-size: 15px;
       font-weight: 700;
-      color: #2a1a22;
+      color: var(--color-navy-black);
     }
 
     .remove-btn {
       background: none;
       border: none;
-      color: #c4a0b0;
+      color: var(--color-blue-gray);
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.05em;
@@ -304,14 +306,14 @@ styles: [`
       text-transform: uppercase;
       transition: color 0.2s;
     }
-    .remove-btn:hover { color: #d33; }
+    .remove-btn:hover { color: var(--ion-color-danger); }
 
     .totals-card {
-      background: #ffffff;
-      border-radius: 20px;
+      background: var(--color-white-near-white);
+      border-radius: var(--app-border-radius-large, 18px);
       overflow: hidden;
       box-shadow: 0 8px 30px rgba(0,0,0,0.04);
-      border: 1px solid #f0e0e8;
+      border: 1px solid var(--color-soft-blue-gray);
       margin-top: 1rem;
     }
 
@@ -326,17 +328,17 @@ styles: [`
       display: flex;
       justify-content: space-between;
       font-size: 14px;
-      color: #5c4b53;
+      color: var(--color-slate-gray);
       font-weight: 500;
     }
 
     .line.grand {
-      border-top: 2px dashed #f0e0e8;
+      border-top: 2px dashed var(--color-soft-blue-gray);
       margin-top: 8px;
       padding-top: 16px;
       font-weight: 800;
       font-size: 18px;
-      color: #2a1a22;
+      color: var(--color-navy-black);
     }
 
     .checkout-btn {
@@ -344,28 +346,25 @@ styles: [`
       width: calc(100% - 3rem);
       margin: 0 1.5rem 1.5rem;
       padding: 1.1rem;
-      background: linear-gradient(135deg, #d45a85 0%, #b33f6c 100%);
+      background: var(--ion-color-primary);
       color: #fff;
       border: none;
-      border-radius: 16px;
+      border-radius: var(--app-border-radius, 12px);
       font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.05em;
       cursor: pointer;
       text-align: center;
-      box-shadow: 0 8px 20px rgba(212, 90, 133, 0.25);
+      box-shadow: 0 8px 20px rgba(14, 168, 125, 0.25);
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .checkout-btn:active {
       transform: translateY(2px);
-      box-shadow: 0 4px 10px rgba(212, 90, 133, 0.2);
+      box-shadow: 0 4px 10px rgba(14, 168, 125, 0.2);
     }
   `],
 })
 export class CartPage {
   readonly cartService = inject(CartService);
-
-  get cart() {
-    return this.cartService.getCurrentCart();
-  }
+  cart$ = this.cartService.cart$;
 }

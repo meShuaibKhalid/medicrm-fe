@@ -1,11 +1,13 @@
-import { Component } from '@angular/core';
-import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs } from '@ionic/angular/standalone';
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, IonBadge } from '@ionic/angular/standalone';
 import { HeaderComponent } from 'src/app/shared/components/header/header.component';
+import { CartService } from 'src/app/core/services/cart.service';
 
 @Component({
   selector: 'app-tabs',
   standalone: true,
-  imports: [IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, HeaderComponent],
+  imports: [CommonModule, IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, IonBadge, HeaderComponent],
   template: `
     <ion-router-outlet></ion-router-outlet>
     <ion-tabs>
@@ -21,6 +23,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
         <ion-tab-button tab="cart" href="/cart">
           <ion-icon name="bag-handle-outline"></ion-icon>
           <ion-label>Cart</ion-label>
+          <ion-badge color="primary" *ngIf="cart$ | async as cart" style="position: absolute; top: 4px; right: calc(50% - 22px); font-size: 10px;">{{ cart.items.length }}</ion-badge>
         </ion-tab-button>
         <ion-tab-button tab="orders" href="/orders">
           <ion-icon name="receipt-outline"></ion-icon>
@@ -41,4 +44,7 @@ import { HeaderComponent } from 'src/app/shared/components/header/header.compone
     }
   `],
 })
-export class TabsPage {}
+export class TabsPage {
+  private readonly cartService = inject(CartService);
+  cart$ = this.cartService.cart$;
+}

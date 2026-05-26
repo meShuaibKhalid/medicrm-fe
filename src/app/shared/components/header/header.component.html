@@ -4,41 +4,128 @@
     <!-- Logo -->
     <div class="logo-container" routerLink="/home" tabindex="0">
       <!-- Using text since image path might vary, but styled like a logo -->
-      <h1 class="logo-text">DVAGO<span class="brand-dot">.</span></h1>
+      <div style="width: 60px">
+        <ion-img src="../assets/logo.png" alt="Logo"></ion-img>
+      </div>
     </div>
 
     <!-- Location Selector -->
-    <div class="location-selector hide-on-mobile" tabindex="0" aria-label="Select delivery location">
+    <div
+      class="location-selector hide-on-mobile"
+      style="position: relative"
+      tabindex="0"
+      aria-label="Select delivery location"
+      (click)="onLocationClick()"
+    >
       <ion-icon name="location-outline"></ion-icon>
       <div class="location-text">
         <span class="location-label">Deliver to</span>
-        <span class="location-value">Select Location</span>
+        <span
+          class="location-value"
+          *ngIf="defaultAddress$ | async as addr; else noAddr"
+        >
+          {{ addr.addressLine }}
+        </span>
+        <ng-template #noAddr
+          ><span class="location-value">Select Location</span></ng-template
+        >
       </div>
       <ion-icon name="chevron-down-outline" class="chevron"></ion-icon>
+      <!-- Overlay Select -->
+      <ion-select
+        *ngIf="isLoggedIn()"
+        interface="popover"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          cursor: pointer;
+        "
+        [ngModel]="(defaultAddress$ | async)?.id"
+        (ngModelChange)="selectAddress($event)"
+      >
+        <ion-select-option
+          *ngFor="let addr of addresses$ | async"
+          [value]="addr.id"
+        >
+          {{ addr.fullName }} - {{ addr.addressLine }}, {{ addr.city }}
+        </ion-select-option>
+      </ion-select>
     </div>
 
     <!-- Search Bar -->
     <div class="search-bar-container">
       <div class="search-bar">
         <ion-icon name="search-outline" class="search-icon"></ion-icon>
-        <input type="text" placeholder="Search for medicines & products..." aria-label="Search" />
+        <input
+          type="text"
+          placeholder="Search for medicines & products..."
+          aria-label="Search"
+        />
       </div>
     </div>
 
     <!-- Actions -->
     <div class="header-actions">
-      <div class="action-item hide-on-mobile" tabindex="0" aria-label="Wishlist">
+      <!-- Switch to Admin Option -->
+      <ng-container *ngIf="currentUser$ | async as user">
+        <div
+          class="action-item"
+          *ngIf="user.role === 'admin'"
+          routerLink="/admin/dashboard"
+          tabindex="0"
+          aria-label="Switch to Admin"
+          style="color: var(--ion-color-primary)"
+        >
+          <ion-icon name="shield-outline"></ion-icon>
+          <span class="action-text hide-on-mobile" style="font-weight: 600"
+            >Admin</span
+          >
+        </div>
+      </ng-container>
+
+      <div
+        class="action-item hide-on-mobile cart-item"
+        routerLink="/wishlist"
+        tabindex="0"
+        aria-label="Wishlist"
+      >
         <ion-icon name="heart-outline"></ion-icon>
         <span class="action-text">Wishlist</span>
+        <ion-badge
+          color="primary"
+          class="cart-badge"
+          *ngIf="wishlist$ | async as wl"
+          >{{ wl.items.length }}</ion-badge
+        >
       </div>
-      <div class="action-item" routerLink="/profile" tabindex="0" aria-label="Profile">
+      <div
+        class="action-item"
+        (click)="goToProfile()"
+        tabindex="0"
+        aria-label="Profile"
+        style="cursor: pointer"
+      >
         <ion-icon name="person-outline"></ion-icon>
         <span class="action-text hide-on-mobile">Profile</span>
       </div>
-      <div class="action-item cart-item" routerLink="/cart" tabindex="0" aria-label="Cart">
+      <div
+        class="action-item cart-item"
+        routerLink="/cart"
+        tabindex="0"
+        aria-label="Cart"
+      >
         <ion-icon name="cart-outline"></ion-icon>
         <span class="action-text hide-on-mobile">Cart</span>
-        <ion-badge color="primary" class="cart-badge">0</ion-badge>
+        <ion-badge
+          color="primary"
+          class="cart-badge"
+          *ngIf="cart$ | async as cart"
+          >{{ cart.items.length }}</ion-badge
+        >
       </div>
     </div>
   </div>
@@ -48,14 +135,30 @@
     <nav class="category-nav">
       <ul class="category-list">
         <li class="category-item" *ngFor="let cat of categories$ | async">
-          <a class="category-link" tabindex="0" [routerLink]="['/categories', cat.slug, 'products']">
-            {{ cat.name }} 
-            <ion-icon name="chevron-down-outline" class="cat-chevron" *ngIf="cat.children && cat.children.length > 0"></ion-icon>
+          <a
+            class="category-link"
+            tabindex="0"
+            [routerLink]="['/categories', cat.slug, 'products']"
+          >
+            {{ cat.name }}
+            <ion-icon
+              name="chevron-down-outline"
+              class="cat-chevron"
+              *ngIf="cat.children && cat.children.length > 0"
+            ></ion-icon>
           </a>
-          
+
           <!-- Dropdown Level 1 -->
-          <div class="category-dropdown" *ngIf="cat.children && cat.children.length > 0">
-            <ng-container *ngTemplateOutlet="categoryTree; context: { $implicit: cat.children }"></ng-container>
+          <div
+            class="category-dropdown"
+            *ngIf="cat.children && cat.children.length > 0"
+          >
+            <ng-container
+              *ngTemplateOutlet="
+                categoryTree;
+                context: { $implicit: cat.children }
+              "
+            ></ng-container>
           </div>
         </li>
       </ul>
@@ -67,15 +170,35 @@
 <ng-template #categoryTree let-children>
   <div class="dropdown-inner">
     <ul class="subcategory-list">
-      <li class="subcategory-item" *ngFor="let sub of children" (mouseenter)="checkSubmenuBounds($event)">
-        <a class="subcategory-link" tabindex="0" [routerLink]="['/categories', sub.slug, 'products']">
+      <li
+        class="subcategory-item"
+        *ngFor="let sub of children"
+        (mouseenter)="checkSubmenuBounds($event)"
+      >
+        <a
+          class="subcategory-link"
+          tabindex="0"
+          [routerLink]="['/categories', sub.slug, 'products']"
+        >
           <span>{{ sub.name }}</span>
-          <ion-icon name="chevron-forward-outline" class="sub-chevron" *ngIf="sub.children && sub.children.length > 0"></ion-icon>
+          <ion-icon
+            name="chevron-forward-outline"
+            class="sub-chevron"
+            *ngIf="sub.children && sub.children.length > 0"
+          ></ion-icon>
         </a>
-        
+
         <!-- Nested Dropdown Level 2+ -->
-        <div class="nested-dropdown" *ngIf="sub.children && sub.children.length > 0">
-          <ng-container *ngTemplateOutlet="categoryTree; context: { $implicit: sub.children }"></ng-container>
+        <div
+          class="nested-dropdown"
+          *ngIf="sub.children && sub.children.length > 0"
+        >
+          <ng-container
+            *ngTemplateOutlet="
+              categoryTree;
+              context: { $implicit: sub.children }
+            "
+          ></ng-container>
         </div>
       </li>
     </ul>
