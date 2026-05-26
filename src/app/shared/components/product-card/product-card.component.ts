@@ -27,16 +27,16 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
           <h3>{{ product.title }}</h3>
           <div class="badges-container">
             <p>{{ product.brand }}</p>
-            <div class="badges">
-              <ion-badge [color]="product.stock > 0 ? 'success' : 'medium'">{{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}</ion-badge>
-              <ion-badge *ngIf="product.prescriptionRequired" color="warning">Prescription Required</ion-badge>
-            </div>
+            
 
           </div>
         </div>
         <div class="card-cart-section">
           <app-price-display [price]="product.price" [salePrice]="product.salePrice" [salePercent]="product.salePercent" class="w-full"></app-price-display>
-        
+        <div class="badges">
+              <ion-badge [color]="product.stock > 0 ? 'success' : 'medium'">{{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}</ion-badge>
+              <ion-badge *ngIf="product.prescriptionRequired" color="warning">Prescription Required</ion-badge>
+            </div>
       </div>
       </ion-card-content>
     </ion-card>
@@ -47,11 +47,12 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
       overflow: hidden;
       position: relative;
       border-radius: 14px;
-      padding-top: 10px;
-      border: 0 !important;
+      padding: 10px;
+      border: 1px solid var(--color-soft-blue-gray);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .04);
       ion-card-content{
             text-align: left;
-          padding: 5px 5px 15px 0;
+          padding: 5px 5px 5px 0;
           border-top-left-radius: 12px;
           border-top-right-radius: 12px;
       }
@@ -69,8 +70,8 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
       position: absolute;
       top: 20px;
       right: 15px;
-      width: 42px;
-      height: 42px;
+      width: 35px;
+      height: 35px;
       border-radius: 50%;
       border: 1px solid #d9deea;
       background: #fff;
@@ -80,28 +81,29 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
     }
     .wishlist-btn ion-icon {
       color: var(--ion-color-primary);
-      font-size: 24px;
+      font-size: 20px;
     }
     .thumb {
          padding: 10px;
         cursor: pointer;
         overflow: hidden;
-        border: 1px solid var(--color-soft-blue-gray);
         border-radius: var(--app-border-radius-small, 8px);
         position: relative;
           button{
-         font-size: 25px;
-    width: 40px;
-    height: 40px;
+    font-size: 25px;
+    width: 37px;
+    padding-top: 5px;
+    height: 37px;
     border-radius: 50%;
     background: var(--ion-color-primary);
     position: absolute;
     bottom: 5px;
     right: 5px;
+    color: white;
       }
     }
     ion-img {
-      height: 190px;
+      height: 170px;
       object-fit: contain;
     }
 
@@ -120,21 +122,28 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-transform: capitalize;
-    font-size: .8rem;
+    font-size: 12px;
     line-height: 1.5;
-    letter-spacing: 0.00938em;    
+    letter-spacing: 0.00938em;  
+    height: 36px;  
+    color: var(--ion-color-dark);
     }
     .meta p {
-      font-size: .76rem;
-      color: #8b8f9d;
-      text-transform: uppercase;
-      letter-spacing: .02em;
+        font-size: 12px;
+    color: #728090;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     }
     .badges-container{
       display:flex;
       align-items:center;
       justify-content:space-between;
        margin-bottom: 3px;
+       height: 38px;
     }
     .badges {
       display:flex;
@@ -144,6 +153,7 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
       ion-badge{
             color: white;
     padding: 3px 5px;
+    font-size: 12px;
       }
     }
     ion-button {

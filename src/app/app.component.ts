@@ -6,6 +6,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
   selector: 'app-root',
   standalone: true,
   templateUrl: 'app.component.html',
+  styleUrl: 'app.component.scss',
   imports: [IonApp, IonRouterOutlet, HeaderComponent, IonIcon],
 })
 export class AppComponent {}

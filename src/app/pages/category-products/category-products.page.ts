@@ -138,7 +138,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     }
     @media (min-width: 992px) {
       .product-grid {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
       }
     }
   `],

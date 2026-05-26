@@ -32,8 +32,8 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
                 <app-price-display [price]="item.product.price" [salePrice]="item.product.salePrice" [salePercent]="item.product.salePercent"></app-price-display>
               </div>
               <div class="action-row">
-                <button class="remove-btn" (click)="wishlistService.removeItem(item.product.id)">Remove</button>
-                <button class="move-btn" (click)="moveToCart(item.product)" [disabled]="item.product.stock < 1">Move to Cart</button>
+                <button class="move-btn" (click)="moveToCart(item.product)" [disabled]="item.product.stock < 1"> <ion-icon name="cart-outline"></ion-icon>Move to Cart</button>
+                <button class="remove-btn" (click)="wishlistService.removeItem(item.product.id)"><ion-icon name="trash-outline"></ion-icon>Remove</button>
               </div>
             </div>
           </div>
@@ -59,12 +59,12 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
     }
 
     .dvago-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 13px;
-      color: var(--color-blue-gray);
-      margin-bottom: 0.5rem;
+         display: flex;
+        gap: 10px;
+        align-items: center;
+        color: var(--ion-color-primary);
+        font-size: 1rem;
+        margin: 10px 0 0;
     }
 
     .dvago-breadcrumb ion-icon {
@@ -155,6 +155,9 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
       padding: 0;
       text-transform: uppercase;
       transition: color 0.2s;
+            display: flex;
+      align-items: center;
+
     }
     .remove-btn:hover { color: var(--ion-color-danger); }
 
@@ -168,9 +171,14 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
       border-radius: var(--app-border-radius-small, 8px);
       cursor: pointer;
       transition: background 0.18s;
+            display: flex;
+      align-items: center;
+            ion-icon{
+            margin-right: 6px;
+    font-size: 16px;
+      }
     }
 
-    .move-btn:hover { background: var(--color-fresh-green); }
     .move-btn:disabled { background: #dcdcdc; color: #a1a1a1; cursor: not-allowed; }
 
     @media (max-width: 600px) {

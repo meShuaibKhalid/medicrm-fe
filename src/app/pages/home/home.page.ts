@@ -51,17 +51,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 
         <div class="section-title">
           <h2>Devices & Support</h2>
-      <button>View All</button></div>
-        <ion-list class="soft-card info-list">
-          <ion-item lines="none">
-            <ion-icon slot="start" name="medical-outline" color="secondary"></ion-icon>
-            <ion-label>Diabetes accessories and daily wellness devices</ion-label>
-          </ion-item>
-          <ion-item lines="none">
-            <ion-icon slot="start" name="shield-checkmark-outline" color="secondary"></ion-icon>
-            <ion-label>Trusted brands and simple refill-friendly ordering</ion-label>
-          </ion-item>
-        </ion-list>
+          <button>View All</button></div>
       </div>
     </ion-content>
 
@@ -228,7 +218,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     }
     .product-grid {
       display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(1, minmax(0, 1fr));
       gap: 18px;
       margin-bottom: 24px;
     }
@@ -245,6 +235,11 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
       }
     }
 
+    @media (min-width: 648px) {
+      .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
     @media (min-width: 992px) {
       // .topbar {
       //   grid-template-columns: 240px minmax(280px, 1fr) 330px auto;
@@ -255,7 +250,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     }
     @media (min-width: 1280px) {
       .product-grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
       }
     }
     

@@ -1,0 +1,40 @@
+.bg {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: linear-gradient(135deg, #f4fffb 0%, #eff8ff 50%, #ffffff 100%);
+
+        .gradient {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(90px);
+                opacity: .35;
+                animation: float 10s ease-in-out infinite;
+
+                &.g1 {
+                        width: 420px;
+                        height: 420px;
+                        background: #34d399;
+                        top: -120px;
+                        left: -120px;
+                }
+
+                &.g2 {
+                        width: 400px;
+                        height: 400px;
+                        background: #60a5fa;
+                        right: -100px;
+                        top: 25%;
+                        animation-delay: 2s;
+                }
+
+                &.g1 {
+                        width: 350px;
+                        height: 350px;
+                        background: #a7f3d0;
+                        bottom: -120px;
+                        left: 25%;
+                        animation-delay: 4s;
+                }
+        }
+}

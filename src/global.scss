@@ -46,7 +46,7 @@ ion-app {
 }
 
 ion-content {
-  --background: var(--color-ice-blue);
+  --background: transparent;
 }
 
 .page-shell {
@@ -61,12 +61,13 @@ ion-content {
   justify-content: space-between;
   margin: 18px 0 14px;
   button{
-    background-color: var(--ion-color-primary);
+    background: linear-gradient(135deg,#10b981,#059669);
     text-transform: uppercase;
     padding: 8px 20px;
-    font-size: .8rem!important;
-    color: #fff!important;
+    font-size: 0.8rem !important;
+    color: #fff !important;
     border-radius: var(--app-border-radius-small, 8px);
+    box-shadow: 0 15px 35px rgba(16, 185, 129, .25);
   }
 }
 
@@ -142,12 +143,12 @@ ion-content {
 
 .dvago-outlined-chip {
   min-width: max-content;
-  padding: 14px 18px;
+  padding: 12px 14px;
   border: 1px solid var(--color-soft-blue-gray);
   border-radius: var(--app-border-radius, 12px);
   background: var(--color-white-near-white);
   color: var(--color-navy-black);
-  font-size: 1rem;
+  font-size: 14px;
 }
 
 .dvago-breadcrumb {
