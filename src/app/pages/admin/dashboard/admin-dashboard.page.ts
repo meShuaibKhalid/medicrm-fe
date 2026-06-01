@@ -10,25 +10,102 @@ import { AdminService } from '../../../core/services/admin.service';
   template: `
     <ion-content>
       <div class="page-shell">
-        <div class="section-title"><h2>Dashboard</h2></div>
+        <div class="section-header">
+          <h2 class="main-title">Dashboard</h2>
+        </div>
+
+        <span class="section-label">OVERVIEW</span>
+
         <div class="stat-grid">
-          <ion-card class="soft-card" *ngFor="let stat of stats">
-            <ion-card-content>
-              <p>{{ stat.label }}</p>
-              <h2>{{ stat.value }}</h2>
+          <ion-card class="theme-card" *ngFor="let stat of stats">
+            <ion-card-content class="card-body">
+              <p class="stat-label">{{ stat.label }}</p>
+              <h2 class="stat-value">{{ stat.value }}</h2>
             </ion-card-content>
           </ion-card>
         </div>
       </div>
     </ion-content>
   `,
-  styles: [`p { margin:0 0 8px; color:#68818d; } h2 { margin:0; color:#173d52; }`],
+  styles: [
+    `
+      .page-shell {
+        padding: 24px;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+          Arial, sans-serif;
+      }
+
+      // Section Title
+      .section-header {
+        margin-bottom: 20px;
+
+        .main-title {
+          font-size: 28px;
+          font-weight: 700;
+          color: #111827; // Dark charcoal
+          margin: 0;
+        }
+      }
+
+      // Section sub-label matching "ALL CATEGORIES"
+      .section-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #0ea87d;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        padding-left: 6px;
+        margin-bottom: 14px;
+        display: block;
+      }
+
+      // Grid Layout
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      // Theme Styled Cards
+      ion-card.theme-card {
+        margin: 0;
+        background: #ffffff;
+        border-radius: 18px; // Smooth, generous rounding from your layout
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03); // Ultra soft shadow
+        border: 1px solid rgba(0, 0, 0, 0.01);
+        overflow: hidden;
+
+        .card-body {
+          padding: 20px;
+        }
+
+        // Muted monospaced/clean label style
+        .stat-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #6b7280; // Muted grey
+          margin: 0 0 8px 0;
+        }
+
+        // Crisp, prominent value header
+        .stat-value {
+          font-size: 24px;
+          font-weight: 700;
+          color: #00a878; // Your primary Emerald Green accent color
+          margin: 0;
+        }
+      }
+    `,
+  ],
 })
 export class AdminDashboardPage {
   private readonly adminService = inject(AdminService);
   stats: { label: string; value: number }[] = [];
 
   constructor() {
-    this.adminService.getDashboardStats().subscribe((stats) => this.stats = stats);
+    this.adminService
+      .getDashboardStats()
+      .subscribe((stats) => (this.stats = stats));
   }
 }
