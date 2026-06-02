@@ -114,12 +114,19 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
         &:hover {
           .cart-btn {
             opacity: 1;
+
           }
         }
       }
 
       .cart-btn {
+         transition: all .2s ease;
         opacity: 0;
+          &:hover{
+            transform: scale(1.05);
+            box-shadow: 0 6px 10px rgb(112 203 179 / 11%);
+        }
+
       }
       .wishlist-btn {
         position: absolute;
@@ -133,6 +140,11 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
         display: grid;
         place-items: center;
         z-index: 2;
+         transition: all .2s ease;
+        &:hover{
+            transform: scale(1.05);
+            box-shadow: 0 6px 10px rgb(112 203 179 / 11%);
+        }
       }
       .wishlist-btn ion-icon {
         color: var(--ion-color-primary);

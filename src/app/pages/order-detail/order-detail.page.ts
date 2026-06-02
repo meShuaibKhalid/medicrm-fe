@@ -11,7 +11,7 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
   standalone: true,
   imports: [CommonModule, IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, OrderStatusBadgeComponent],
   template: `
-    <ion-header class="ion-no-border"><ion-toolbar><ion-title>Order Detail</ion-title></ion-toolbar></ion-header>
+    <ion-header class="ion-no-border"><ion-toolbar><ion-title class="header-title">Order Detail</ion-title></ion-toolbar></ion-header>
     <ion-content *ngIf="order">
       <div class="page-shell">
         <ion-card class="soft-card">
@@ -42,6 +42,22 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
       </div>
     </ion-content>
   `,
+  styles: [`
+    .page-shell {
+          max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    }
+    .soft-card{
+      background: #fff;
+    }
+    ion-list{
+      margin-inline: 10px;
+      ion-item{
+        --background: transparent;
+      }
+    }
+    `]
 })
 export class OrderDetailPage {
   private readonly route = inject(ActivatedRoute);

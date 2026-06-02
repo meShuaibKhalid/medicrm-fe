@@ -462,18 +462,7 @@ import { Category } from '../../../shared/models/app.models';
         }
       }
 
-      // Modal
-      .admin-modal {
-        // border: none;
-        // border-radius: 24px;
-        // width: 100%;
-        // max-width: 520px;
-        // box-shadow: 0 8px 40px rgba(201, 79, 124, 0.18);
-        // padding: 0;
-        // &::backdrop {
-        //   background: rgba(44, 26, 34, 0.35);
-        // }
-      }
+
       .modal-head {
         padding: 18px 22px 14px;
         border-bottom: 1px solid #fae8ef;

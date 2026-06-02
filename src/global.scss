@@ -634,3 +634,6 @@ ion-title.header-title {
     }
   }
 }
+ion-select,ion-input{
+  --highlight-color:transparent !important;
+}
