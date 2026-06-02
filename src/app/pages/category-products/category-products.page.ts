@@ -72,31 +72,8 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
       padding-bottom: 8px;
       margin-bottom: 18px;
     }
-    .dvago-breadcrumb {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      color: var(--ion-color-primary);
-      font-size: 1rem;
-      margin: 10px 0 22px;
-    }
-    .dvago-outlined-chip {
-      min-width: max-content;
-      padding: 7px 9px;
-      border: 1px solid var(--color-soft-blue-gray);
-      border-radius: var(--app-border-radius-small, 8px);
-      background: var(--color-white-near-white);
-      color: var(--color-navy-black);
-      font-size: 0.75rem;
-    }
     .filters-card {
       margin-bottom: 18px;
-    }
-    .product-grid {
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:18px;
-      margin-top: 16px;
     }
     .bottom-bar {
       display: flex;
@@ -135,11 +112,6 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
       background: var(--ion-color-primary);
       color: #fff;
       border-color: var(--ion-color-primary);
-    }
-    @media (min-width: 992px) {
-      .product-grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-      }
     }
   `],
 })

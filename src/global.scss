@@ -25,7 +25,7 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-*{
+* {
   font-family: "Poppins", sans-serif;
 }
 
@@ -55,13 +55,15 @@ ion-content {
   margin: 0 auto;
 }
 
+
 .section-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 18px 0 14px;
-  button{
-    background: linear-gradient(135deg,#10b981,#059669);
+
+  button {
+    background: linear-gradient(135deg, #10b981, #059669);
     text-transform: uppercase;
     padding: 8px 20px;
     font-size: 0.8rem !important;
@@ -73,13 +75,28 @@ ion-content {
 
 .section-title h2,
 .section-title h3 {
-    font-weight: 600;
-    text-transform: capitalize;
-    position: relative;
-    font-size: 1.4rem;
-    margin-bottom: 0;
-    color: var(--color-navy-black);
+  font-weight: 600;
+  text-transform: capitalize;
+  position: relative;
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--color-navy-black);
 }
+
+/* Shared button styles (moved from repeated page inline styles) */
+.action-btn,
+.btn-edit {
+  padding: 8px;
+  background: var(--ion-color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--app-border-radius-small, 8px);
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
 
 .soft-card {
   border-radius: var(--app-border-radius-large, 18px);
@@ -97,6 +114,7 @@ ion-content {
 .form-stack {
   display: grid;
   gap: 12px;
+  width: 100%;
 }
 
 .price-old {
@@ -164,11 +182,12 @@ ion-content {
   font-size: 14px;
 }
 
-.w-full{
+.w-full {
   width: 100%;
 }
-ion-content{
-  &::part(scroll){
+
+ion-content {
+  &::part(scroll) {
     scrollbar-width: thin;
   }
 }
@@ -195,10 +214,13 @@ ion-content{
   text-align: left;
   font-size: 0.95rem;
 
-  th, td {
-    padding: 14px 16px;
+  th,
+  td {
+    padding: 12px;
     border-bottom: 1px solid var(--color-soft-blue-gray);
     vertical-align: middle;
+    font-size: 12px;
+    max-width: 250px;
   }
 
   th {
@@ -286,6 +308,7 @@ dialog.admin-modal {
       color: var(--color-slate-gray);
       line-height: 1;
       padding: 4px;
+
       &:hover {
         color: var(--color-navy-black);
       }
@@ -320,12 +343,294 @@ dialog.admin-modal {
   border-radius: var(--app-border-radius, 12px);
   font-size: 0.9rem;
   color: var(--color-blue-gray);
+
   ion-button {
     margin: 0;
   }
 }
 
+ion-modal {
+  --height: auto;
+  --border-radius: 18px;
 
+  .modal-body {
+    background: #fff;
+  }
+}
 
+ion-title.header-title {
+  font-weight: 600;
+  color: var(--color-navy-black);
+  padding: 0 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-size: 1.2rem;
+}
 
+/* Product Grid Layout */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
 
+@media (min-width: 648px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 992px) {
+  .product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .product-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* Common Components */
+.brand-pill {
+  display: inline-block;
+  background: #e1f5ee;
+  color: #0f6e56;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  letter-spacing: 0.04em;
+}
+
+.rx-badge {
+  color: #fff;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.divider {
+  width: 100%;
+  height: 0.5px;
+  background: rgba(29, 158, 117, 0.15);
+  margin: 14px 0;
+}
+
+/* Auth Pages Shared Styles */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--color-ice-blue);
+}
+
+.auth-card {
+  background: var(--color-white-near-white);
+  border-radius: var(--app-border-radius-large, 18px);
+  padding: 2.5rem 2rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 40px rgba(12, 20, 39, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--color-soft-blue-gray);
+}
+
+.auth-logo-wrap {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--color-pale-mint);
+  border: 2.5px solid var(--ion-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.auth-field {
+  width: 100%;
+  border: 1.5px solid var(--color-soft-blue-gray);
+  border-radius: var(--app-border-radius, 12px);
+  padding: 0.8rem 1rem;
+  font-size: 14px;
+  color: var(--color-navy-black);
+  background: var(--color-white-near-white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &::placeholder {
+    color: var(--color-blue-gray);
+  }
+
+  &:focus {
+    border-color: var(--ion-color-primary);
+    box-shadow: 0 0 0 3px rgba(14, 168, 125, 0.10);
+  }
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 0.9rem;
+  background: var(--ion-color-primary);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  border: none;
+  border-radius: var(--app-border-radius, 12px);
+  cursor: pointer;
+  text-transform: uppercase;
+  margin-top: 0.4rem;
+  transition: background 0.18s;
+}
+
+/* Header Layout & Pills (Duplicated in Home/Cart) */
+.header-layout-wrapper {
+  .topbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .logo {
+      height: 48px;
+    }
+  }
+
+  .brand-block {
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--ion-color-primary);
+    }
+
+    span {
+      display: block;
+      color: var(--ion-color-primary);
+      font-size: .82rem;
+      font-weight: 600;
+    }
+  }
+
+  .utility-pill,
+  .icon-pill {
+    flex: 1;
+    border: 1px solid #e3e6ef;
+    background: #fff;
+    min-height: 42px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 5px;
+    font-weight: 700;
+    color: #222;
+    font-size: 12px;
+    max-width: 380px;
+    min-width: 130px;
+
+    ion-icon {
+      font-size: 22px;
+      color: var(--ion-color-primary);
+    }
+  }
+
+  .icon-pill {
+    width: 54px;
+    justify-content: center;
+    padding: 0;
+    flex: 0 0 54px;
+  }
+
+  .action-pills {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-left: auto;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .header-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #5e971a;
+    color: #fff;
+    padding: 7px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1;
+    margin-left: 6px;
+    height: fit-content;
+    white-space: nowrap;
+
+    &.instant-btn {
+      background-color: var(--ion-color-primary) !important;
+    }
+
+    ion-icon {
+      font-size: 25px;
+      margin-right: 4px;
+    }
+  }
+
+  .green-pill {
+    background: #7ea731;
+    color: #fff;
+    border-color: #7ea731;
+
+    ion-icon {
+      color: #fff;
+    }
+  }
+
+  .primary-pill {
+    background: var(--ion-color-primary);
+    color: #fff;
+    border-color: var(--ion-color-primary);
+
+    ion-icon {
+      color: #fff;
+    }
+  }
+
+  .nav-scroll {
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 0 5px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .category-list {
+      display: flex;
+      flex-wrap: nowrap;
+      padding: 0 5px;
+      flex-grow: 1;
+      position: relative;
+    }
+  }
+}
+
+::ng-deep {
+  ion-searchbar.custom-searchbar {
+    input {
+      background: transparent !important;
+      font-size: 12px !important;
+    }
+  }
+}

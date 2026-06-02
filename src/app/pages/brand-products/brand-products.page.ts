@@ -27,7 +27,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
         </div>
 
         <div class="product-grid" *ngIf="!loading && !loadError">
-          <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
+          <app-product-card *ngFor="let product of products" [product]="product" (openProduct)="openProduct($event)"></app-product-card>
         </div>
 
         <div class="state-card" *ngIf="loading">Loading products...</div>
@@ -179,6 +179,9 @@ export class BrandProductsPage {
       this.pagination = response.pagination;
       this.loading = false;
     });
+  }
+    openProduct(product: Product): void {
+    this.router.navigate(['/products', product.slug], { state: { product } });
   }
 
   goToPage(page: number): void {

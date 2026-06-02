@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonAlert } from '@ionic/angular/standalone';
-import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonSearchbar, IonSelect, IonSelectOption, IonTextarea, IonToggle } from '@ionic/angular/standalone';
+import { RouterLink } from '@angular/router';
+import { IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonSearchbar, IonSelect, IonSelectOption, IonTextarea, IonToggle,IonModal } from '@ionic/angular/standalone';
+import { ProductService } from '../../../core/services/product.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { Brand, Product, Category } from '../../../shared/models/app.models';
 import { BrandService } from '../../../core/services/brand.service';
 import { toSlug } from '../../../shared/utils/slug';
+import { IonAlert } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-admin-products',
@@ -27,15 +29,17 @@ import { toSlug } from '../../../shared/utils/slug';
     IonSelectOption,
     IonTextarea, 
     IonToggle,
+    IonIcon,
+    IonModal
   ],
   template: `
     <ion-content>
       <div class="page-shell">
         <div class="section-title">
           <h2>Products</h2>
-          <ion-button size="small" (click)="openAddModal()">Add Product</ion-button>
+          <button size="small" class="add-btn" (click)="openAddModal()">Add Product</button>
         </div>
-        <ion-searchbar placeholder="Search products" [(ngModel)]="search" (ionInput)="onSearchInput()"></ion-searchbar>
+        <ion-searchbar placeholder="Search products" class="theme-search" [(ngModel)]="search" (ionInput)="onSearchInput()"></ion-searchbar>
         
         <div class="admin-table-wrapper">
           <table class="admin-table">
@@ -83,136 +87,138 @@ import { toSlug } from '../../../shared/utils/slug';
         </div>
 
         <!-- Dialog Modal for Add/Edit Product -->
-        <dialog #productDialog class="admin-modal" style="max-width: 800px;">
-          <div class="modal-header">
-            <h3>{{ form.value.id ? 'Edit Product' : 'Add Product' }}</h3>
-            <button (click)="closeModal()">&times;</button>
-          </div>
-          <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-            <form [formGroup]="form" class="form-stack">
-              <div class="modal-grid-2">
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Title *</ion-label>
-                  <ion-input formControlName="title" placeholder="Product Title" (ionInput)="onTitleInput()"></ion-input>
-                </ion-item>
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Slug *</ion-label>
-                  <ion-input formControlName="slug" placeholder="product-slug" (ionInput)="onSlugInput()"></ion-input>
-                </ion-item>
-              </div>
-
-              <div class="modal-grid-2">
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Brand</ion-label>
-                  <ion-select formControlName="brandId" interface="popover" placeholder="Select brand">
-                    <ion-select-option value="">No Brand</ion-select-option>
-                    <ion-select-option *ngFor="let brand of brands" [value]="brand.id">{{ brand.name }}</ion-select-option>
-                  </ion-select>
-                </ion-item>
-                <div class="category-picker soft-card">
-                  <label class="field-label">Category *</label>
-                  <div class="category-dropdown">
-                    <input
-                      type="text"
-                      [(ngModel)]="categorySearch"
-                      [ngModelOptions]="{ standalone: true }"
-                      placeholder="Search categories"
-                      class="category-search-input"
-                      (focus)="openCategoryDropdown()"
-                      (input)="openCategoryDropdown()"
-                    />
-                    <button
-                      type="button"
-                      class="category-toggle-btn"
-                      (click)="toggleCategoryDropdown()"
-                      aria-label="Toggle category dropdown"
-                    >
-                      {{ isCategoryDropdownOpen ? '▲' : '▼' }}
-                    </button>
-                  </div>
-                  <div class="category-results" *ngIf="isCategoryDropdownOpen">
-                    <button
-                      *ngFor="let category of filteredCategories"
-                      type="button"
-                      class="category-option"
-                      [class.selected]="form.value.primaryCategoryId === category.id"
-                      (click)="selectCategory(category)"
-                    >
-                      {{ category.name }}
-                    </button>
-                    <p class="category-empty" *ngIf="filteredCategories.length === 0">No categories found.</p>
-                  </div>
-                  <p class="selected-category" *ngIf="selectedCategoryLabel">Selected: {{ selectedCategoryLabel }}</p>
+        <!-- <dialog #productDialog class="admin-modal" style="max-width: 800px;"> -->
+          <ion-modal #productDialog [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+            <div class="modal-header">
+              <h3>{{ form.value.id ? 'Edit Product' : 'Add Product' }}</h3>
+              <button (click)="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+              <form [formGroup]="form" class="form-stack">
+                <div class="modal-grid-2">
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Title *</ion-label>
+                    <ion-input formControlName="title" placeholder="Product Title" (ionInput)="onTitleInput()"></ion-input>
+                  </ion-item>
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Slug *</ion-label>
+                    <ion-input formControlName="slug" placeholder="product-slug" (ionInput)="onSlugInput()"></ion-input>
+                  </ion-item>
                 </div>
-              </div>
-
-              <div class="modal-grid-2">
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Price *</ion-label>
-                  <ion-input type="number" formControlName="price" placeholder="Rs. 0.00"></ion-input>
-                </ion-item>
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Sale Price</ion-label>
-                  <ion-input type="number" formControlName="salePrice" placeholder="Rs. 0.00"></ion-input>
-                </ion-item>
-              </div>
-
-              <div class="modal-grid-2">
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Sale Percent</ion-label>
-                  <ion-input type="number" formControlName="salePercent" placeholder="0"></ion-input>
-                </ion-item>
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Stock</ion-label>
-                  <ion-input type="number" formControlName="stock" placeholder="0"></ion-input>
-                </ion-item>
-              </div>
-
-              <div class="modal-grid-2">
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Max Order</ion-label>
-                  <ion-input type="number" formControlName="maxOrder" placeholder="10"></ion-input>
-                </ion-item>
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Used For</ion-label>
-                  <ion-input formControlName="usedFor" placeholder="Fever, pain, etc."></ion-input>
-                </ion-item>
-              </div>
-
-              <div class="soft-card image-upload-card">
-                <label class="field-label">Product Image</label>
-                <input type="file" accept="image/*" (change)="onImageSelected($event)" />
-                <p class="selected-file" *ngIf="selectedImageName">{{ selectedImageName }}</p>
-                <div class="image-preview" *ngIf="imagePreviewUrl">
-                  <img [src]="imagePreviewUrl" [alt]="form.value.title || 'Product image preview'" />
+  
+                <div class="modal-grid-2">
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Brand</ion-label>
+                    <ion-select formControlName="brandId" interface="popover" placeholder="Select brand">
+                      <ion-select-option value="">No Brand</ion-select-option>
+                      <ion-select-option *ngFor="let brand of brands" [value]="brand.id">{{ brand.name }}</ion-select-option>
+                    </ion-select>
+                  </ion-item>
+                  <div class="category-picker soft-card">
+                    <label class="field-label">Category *</label>
+                    <div class="category-dropdown">
+                      <input
+                        type="text"
+                        [(ngModel)]="categorySearch"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Search categories"
+                        class="category-search-input"
+                        (focus)="openCategoryDropdown()"
+                        (input)="openCategoryDropdown()"
+                      />
+                      <button
+                        type="button"
+                        class="category-toggle-btn"
+                        (click)="toggleCategoryDropdown()"
+                        aria-label="Toggle category dropdown"
+                      >
+                        {{ isCategoryDropdownOpen ? '▲' : '▼' }}
+                      </button>
+                    </div>
+                    <div class="category-results" *ngIf="isCategoryDropdownOpen">
+                      <button
+                        *ngFor="let category of filteredCategories"
+                        type="button"
+                        class="category-option"
+                        [class.selected]="form.value.primaryCategoryId === category.id"
+                        (click)="selectCategory(category)"
+                      >
+                        {{ category.name }}
+                      </button>
+                      <p class="category-empty" *ngIf="filteredCategories.length === 0">No categories found.</p>
+                    </div>
+                    <p class="selected-category" *ngIf="selectedCategoryLabel">Selected: {{ selectedCategoryLabel }}</p>
+                  </div>
                 </div>
-              </div>
-
-              <ion-item class="soft-card">
-                <ion-label position="stacked">Description</ion-label>
-                <ion-textarea formControlName="description" rows="3" placeholder="Enter product description..."></ion-textarea>
-              </ion-item>
-
-              <div class="modal-grid-2">
-                <ion-item class="soft-card" style="align-items: center; display: flex; height: 100%;">
-                  <ion-label>Prescription Required</ion-label>
-                  <ion-toggle formControlName="prescriptionRequired"></ion-toggle>
+  
+                <div class="modal-grid-2">
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Price *</ion-label>
+                    <ion-input type="number" formControlName="price" placeholder="Rs. 0.00"></ion-input>
+                  </ion-item>
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Sale Price</ion-label>
+                    <ion-input type="number" formControlName="salePrice" placeholder="Rs. 0.00"></ion-input>
+                  </ion-item>
+                </div>
+  
+                <div class="modal-grid-2">
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Sale Percent</ion-label>
+                    <ion-input type="number" formControlName="salePercent" placeholder="0"></ion-input>
+                  </ion-item>
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Stock</ion-label>
+                    <ion-input type="number" formControlName="stock" placeholder="0"></ion-input>
+                  </ion-item>
+                </div>
+  
+                <div class="modal-grid-2">
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Max Order</ion-label>
+                    <ion-input type="number" formControlName="maxOrder" placeholder="10"></ion-input>
+                  </ion-item>
+                  <ion-item class="soft-card">
+                    <ion-label position="stacked">Used For</ion-label>
+                    <ion-input formControlName="usedFor" placeholder="Fever, pain, etc."></ion-input>
+                  </ion-item>
+                </div>
+  
+                <div class="soft-card image-upload-card">
+                  <label class="field-label">Product Image</label>
+                  <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+                  <p class="selected-file" *ngIf="selectedImageName">{{ selectedImageName }}</p>
+                  <div class="image-preview" *ngIf="imagePreviewUrl">
+                    <img [src]="imagePreviewUrl" [alt]="form.value.title || 'Product image preview'" />
+                  </div>
+                </div>
+  
+                <ion-item class="soft-card">
+                  <ion-label position="stacked">Description</ion-label>
+                  <ion-textarea formControlName="description" rows="3" placeholder="Enter product description..."></ion-textarea>
                 </ion-item>
-                <ion-item class="soft-card" style="align-items: center; display: flex; height: 100%;">
-                  <ion-label>Active</ion-label>
-                  <ion-toggle formControlName="isActive"></ion-toggle>
-                </ion-item>
-              </div>
-
-              <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
-                <ion-button fill="outline" color="medium" (click)="closeModal()">Cancel</ion-button>
-                <ion-button [disabled]="form.invalid" (click)="save()">
-                  {{ form.value.id ? 'Update Product' : 'Save Product' }}
-                </ion-button>
-              </div>
-            </form>
-          </div>
-        </dialog>
+  
+                <div class="modal-grid-2">
+                  <ion-item class="soft-card" style="align-items: center; display: flex; height: 100%;">
+                    <ion-label>Prescription Required</ion-label>
+                    <ion-toggle formControlName="prescriptionRequired"></ion-toggle>
+                  </ion-item>
+                  <ion-item class="soft-card" style="align-items: center; display: flex; height: 100%;">
+                    <ion-label>Active</ion-label>
+                    <ion-toggle formControlName="isActive"></ion-toggle>
+                  </ion-item>
+                </div>
+  
+                <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
+                  <ion-button fill="outline" color="medium" (click)="closeModal()">Cancel</ion-button>
+                  <ion-button [disabled]="form.invalid" (click)="save()">
+                    {{ form.value.id ? 'Update Product' : 'Save Product' }}
+                  </ion-button>
+                </div>
+              </form>
+            </div>
+          </ion-modal>
+        <!-- </dialog> -->
 
         <ion-alert
           [isOpen]="isDeleteConfirmOpen"
@@ -222,142 +228,551 @@ import { toSlug } from '../../../shared/utils/slug';
           (didDismiss)="closeDeleteConfirm()"
         ></ion-alert>
       </div>
-    </ion-content>
+
+      <div class="empty-state-row" *ngIf="products.length === 0">
+        <p>No products found.</p>
+      </div>
+
+    <!-- </div> -->
+
+    <!-- <div class="pagination-footer" *ngIf="totalPages > 1">
+      <button class="page-nav" [disabled]="page === 1" (click)="goToPage(page - 1)">
+        <ion-icon name="chevron-back-outline"></ion-icon> Previous
+      </button>
+      <span class="page-info">Page {{ page }} of {{ totalPages }}</span>
+      <button class="page-nav" [disabled]="page === totalPages" (click)="goToPage(page + 1)">
+        Next <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </div> -->
+
+  <!-- Dialog Modal for Add/Edit Product -->
+     <!-- <dialog #productDialog class="admin-modal matching-theme"> -->
+      <ion-modal #productDialog [isOpen]="isModalOpen" (didDismiss)="isModalOpen = false">
+        <ng-template>
+        <div class="modal-content-wrapper">
+          
+          <div class="modal-header">
+            <h3 class="modal-heading">{{ form.value.id ? 'Edit Product' : 'Add Product' }}</h3>
+            <button type="button" class="close-circle-btn" (click)="closeModal()">&times;</button>
+          </div>
+      
+          <div class="modal-body-scroll">
+            <form [formGroup]="form">
+              
+              <div class="modal-grid-2">
+                <div class="form-field-group">
+                  <label class="form-field-label">NAME *</label>
+                  <div class="custom-input-box">
+                    <ion-input formControlName="title" placeholder="Product Title"></ion-input>
+                  </div>
+                </div>
+                <div class="form-field-group">
+                  <label class="form-field-label">SLUG *</label>
+                  <div class="custom-input-box">
+                    <ion-input formControlName="slug" placeholder="product-slug"></ion-input>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="modal-grid-2">
+                <div class="form-field-group">
+                  <label class="form-field-label">BRAND</label>
+                  <div class="custom-input-box">
+                    <ion-input formControlName="brand" placeholder="Brand Name"></ion-input>
+                  </div>
+                </div>
+                <div class="form-field-group">
+                  <label class="form-field-label">CATEGORY *</label>
+                  <div class="custom-input-box dynamic-select-box">
+                    <ion-select formControlName="primaryCategoryId" interface="popover" placeholder="Select">
+                      <ion-select-option *ngFor="let category of categories" [value]="category.id">
+                        {{ category.name }}
+                      </ion-select-option>
+                    </ion-select>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="modal-grid-2">
+                <div class="form-field-group">
+                  <label class="form-field-label">PRICE *</label>
+                  <div class="custom-input-box">
+                    <ion-input type="number" formControlName="price" placeholder="Rs. 0.00"></ion-input>
+                  </div>
+                </div>
+                <div class="form-field-group">
+                  <label class="form-field-label">SALE PRICE</label>
+                  <div class="custom-input-box">
+                    <ion-input type="number" formControlName="salePrice" placeholder="Rs. 0.00"></ion-input>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="modal-grid-2">
+                <div class="form-field-group">
+                  <label class="form-field-label">SALE PERCENT</label>
+                  <div class="custom-input-box">
+                    <ion-input type="number" formControlName="salePercent" placeholder="0"></ion-input>
+                  </div>
+                </div>
+                <div class="form-field-group">
+                  <label class="form-field-label">STOCK</label>
+                  <div class="custom-input-box">
+                    <ion-input type="number" formControlName="stock" placeholder="0"></ion-input>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="modal-grid-2">
+                <div class="form-field-group">
+                  <label class="form-field-label">MAX ORDER</label>
+                  <div class="custom-input-box">
+                    <ion-input type="number" formControlName="maxOrder" placeholder="10"></ion-input>
+                  </div>
+                </div>
+                <div class="form-field-group">
+                  <label class="form-field-label">USED FOR</label>
+                  <div class="custom-input-box">
+                    <ion-input formControlName="usedFor" placeholder="Fever, pain, etc."></ion-input>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="form-field-group full-width-field">
+                <label class="form-field-label">IMAGE URL</label>
+                <div class="custom-input-box">
+                  <ion-input formControlName="image" placeholder="https://example.com/image.jpg"></ion-input>
+                </div>
+              </div>
+      
+              <div class="form-field-group full-width-field">
+                <label class="form-field-label">DESCRIPTION</label>
+                <div class="custom-input-box text-area-box">
+                  <ion-textarea formControlName="description" rows="3" placeholder="Enter product description..."></ion-textarea>
+                </div>
+              </div>
+      
+              <div class="modal-grid-2 alignment-fix">
+                <div class="form-field-group text-row-layout">
+                  <label class="form-field-label">PRESCRIPTION REQUIRED</label>
+                  <div class="custom-toggle-container">
+                    <span class="toggle-state-text">
+                      {{ form.get('prescriptionRequired')?.value ? 'Required' : 'None' }}
+                    </span>
+                    <ion-toggle formControlName="prescriptionRequired" class="emerald-toggle"></ion-toggle>
+                  </div>
+                </div>
+                
+                <div class="form-field-group text-row-layout">
+                  <label class="form-field-label">STATUS</label>
+                  <div class="custom-toggle-container">
+                    <span class="toggle-state-text">
+                      {{ form.get('isActive')?.value ? 'Active' : 'Inactive' }}
+                    </span>
+                    <ion-toggle formControlName="isActive" class="emerald-toggle"></ion-toggle>
+                  </div>
+                </div>
+              </div>
+      
+              <div class="modal-action-footer">
+                <button type="button" class="auth-field" (click)="closeModal()">CANCEL</button>
+                <button type="submit" class="auth-btn" [disabled]="form.invalid" (click)="save()">
+                  {{ form.value.id ? 'UPDATE CATEGORY' : 'SAVE CATEGORY' }}
+                </button>
+              </div>
+      
+            </form>
+          </div>
+          
+        </div>
+      </ng-template>
+      </ion-modal>
+<!-- </dialog> -->
+  <!-- </div> -->
+</ion-content>
   `,
   styles: [`
-    .page-shell {
-      padding-top: 50px;
-    }
-
-    .field-label {
-      display: block;
-      margin-bottom: 10px;
-      color: #24404a;
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-
-    .category-picker,
-    .image-upload-card {
-      padding: 16px;
-      border-radius: 20px;
-      background: #fff;
-    }
-
-    .category-search {
-      --background: #f5f8fa;
-      --box-shadow: none;
-      padding-inline: 0;
-    }
-
-    .category-picker {
-      position: relative;
-      z-index: 5;
-    }
-
-    .category-dropdown {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .category-search-input {
-      width: 100%;
-      min-height: 44px;
-      border: 1px solid #d8e4ea;
-      border-radius: 14px;
-      background: #f5f8fa;
-      color: #24404a;
-      font: inherit;
-      outline: none;
-      padding: 0 44px 0 14px;
-    }
-
-    .category-search-input:focus {
-      border-color: #0f8a6c;
-      background: #fff;
-    }
-
-    .category-toggle-btn {
-      position: absolute;
-      right: 10px;
-      border: 0;
-      background: transparent;
-      color: #55707a;
-      cursor: pointer;
-      font-size: 0.9rem;
-      padding: 4px;
-    }
-
-    .category-results {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 0;
-      right: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 240px;
-      overflow-y: auto;
-      padding: 10px;
-      border: 1px solid #d8e4ea;
-      border-radius: 16px;
-      background: #fff;
-      box-shadow: 0 16px 30px rgba(15, 34, 48, 0.14);
-      z-index: 20;
-    }
-
-    .category-option {
-      border: 1px solid #d8e4ea;
-      border-radius: 14px;
-      background: #f9fbfc;
-      color: #24404a;
-      cursor: pointer;
-      font: inherit;
-      padding: 10px 12px;
-      text-align: left;
-      transition: 0.2s ease;
-    }
-
-    .category-option.selected {
-      border-color: #0f8a6c;
-      background: #e8f7f1;
-      color: #0f6c56;
-    }
-
-    .selected-category,
-    .selected-file {
-      margin: 10px 0 0;
-      color: #55707a;
-      font-size: 0.9rem;
-    }
-
-    .category-empty {
+   .page-shell {
+    margin: 0 auto;
+    padding: 20px 16px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    .section-title{
       margin: 0;
-      color: #7b8d96;
-      font-size: 0.9rem;
-      padding: 10px 12px;
+      .add-btn{
+            background: linear-gradient(
+      135deg,
+      #10b981,
+      #059669);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    text-transform: capitalize;
+      }
     }
+}
 
-    .image-upload-card input[type="file"] {
-      display: block;
-      width: 100%;
-      padding: 10px 0;
-    }
+.field-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #24404a;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
 
-    .image-preview {
-      margin-top: 12px;
-    }
+.category-picker,
+.image-upload-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: #fff;
+}
 
-    .image-preview img {
-      width: 160px;
-      height: 160px;
-      object-fit: contain;
-      border-radius: 16px;
-      background: #f6f8fa;
-      border: 1px solid #d8e4ea;
-      padding: 10px;
+.category-search {
+  --background: #f5f8fa;
+  --box-shadow: none;
+  padding-inline: 0;
+}
+
+.category-picker {
+  position: relative;
+  z-index: 5;
+}
+
+.category-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+// FIX 1: .btn-action-edit was missing its closing brace,
+// causing .btn-action-delete to be nested inside it.
+.btn-action-edit {
+  padding: 8px;
+  background: var(--ion-color-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--app-border-radius-small, 8px);
+  cursor: pointer;
+
+  &:hover {
+    background: #d0f0e5;
+  }
+} // <-- was missing
+
+.btn-action-delete {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: #fee2e2;
+  }
+}
+
+.theme-search{
+      --background: #ffffff;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    padding: 0;
+}
+
+// Fallback Container rows
+.empty-state-row {
+  padding: 40px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+// Footer Component configurations
+.pagination-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 24px;
+
+  .page-nav {
+    background: white;
+    border: 1px solid #e5e7eb;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
+  }
+
+  .page-info {
+    font-size: 13px;
+    color: #6b7280;
+  }
+}
+
+// Responsive layout breakpoint rules
+@media (max-width: 680px) {
+  .product-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .product-actions-block {
+    width: 100%;
+
+    .btn-action-edit,
+    .btn-action-delete {
+      flex: 1;
+      text-align: center;
+    }
+  }
+}
+
+// Modal Shell Configuration matching exact dimensions and border radii
+dialog.admin-modal.matching-theme {
+  border: none;
+  border-radius: 28px;
+  padding: 0;
+  width: 90%;
+  max-width: 740px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+
+  &::backdrop {
+    background: rgba(15, 23, 42, 0.15);
+    backdrop-filter: blur(4px);
+  }
+}
+
+// Modal Header
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0;
+  padding: 18px 22px 14px;
+
+  .modal-heading {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+  }
+
+  .close-circle-btn {
+    background: #00a878;
+    color: #ffffff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #009368;
+    }
+  }
+}
+
+.modal-action-footer{
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  button{
+    width: auto !important;
+  }
+}
+
+// Content scroll restrictions to protect modal aspect ratios
+.modal-body-scroll {
+  max-height: 72vh;
+  overflow-y: auto;
+  padding: 24px;
+  background: #fff;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+  }
+}
+
+// 2-Column form grid mapping layout instructions
+.modal-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.full-width-field {
+  margin-bottom: 16px;
+}
+
+// Structural Typography & Input Elements
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .form-field-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #00a878;
+  }
+
+  // FIX 2: .custom-input-box was never closed, swallowing all
+  // the category/image classes below as unintended children.
+  .custom-input-box {
+    background: #ffffff;
+    border: 1px solid #f2f4f6;
+    border-radius: 12px;
+    padding: 2px 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus-within {
+      border-color: #00a878;
+    }
+  } // <-- was missing
+}
+
+// FIX 3: These are all siblings of .form-field-group,
+// not children of .custom-input-box.
+.category-search-input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #d8e4ea;
+  border-radius: 14px;
+  background: #f5f8fa;
+  color: #24404a;
+  font: inherit;
+  outline: none;
+  padding: 0 44px 0 14px;
+
+  &:focus {
+    border-color: #0f8a6c;
+    background: #fff;
+  }
+}
+
+.category-toggle-btn {
+  position: absolute;
+  right: 10px;
+  border: 0;
+  background: transparent;
+  color: #55707a;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px;
+}
+
+.category-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #d8e4ea;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 16px 30px rgba(15, 34, 48, 0.14);
+  z-index: 20;
+}
+
+.category-option {
+  border: 1px solid #d8e4ea;
+  border-radius: 14px;
+  background: #f9fbfc;
+  color: #24404a;
+  cursor: pointer;
+  font: inherit;
+  padding: 10px 12px;
+  text-align: left;
+  transition: 0.2s ease;
+
+  &.selected {
+    border-color: #0f8a6c;
+    background: #e8f7f1;
+    color: #0f6c56;
+  }
+}
+
+.selected-category,
+.selected-file {
+  margin: 10px 0 0;
+  color: #55707a;
+  font-size: 0.9rem;
+}
+
+.category-empty {
+  margin: 0;
+  color: #7b8d96;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+}
+
+.image-upload-card {
+  input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+  }
+}
+
+.image-preview {
+  margin-top: 12px;
+
+  img {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    border-radius: 16px;
+    background: #f6f8fa;
+    border: 1px solid #d8e4ea;
+    padding: 10px;
+  }
+}
   `],
 })
 export class AdminProductsPage implements OnDestroy {
@@ -367,6 +782,7 @@ export class AdminProductsPage implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+  isModalOpen = false;
   search = '';
   products: Product[] = [];
   categories: Category[] = [];
@@ -469,6 +885,7 @@ export class AdminProductsPage implements OnDestroy {
     if (dialog && !dialog.open) {
       dialog.showModal();
     }
+     this.isModalOpen = true;
   }
 
   edit(product: Product): void {
@@ -500,14 +917,16 @@ export class AdminProductsPage implements OnDestroy {
     if (dialog && !dialog.open) {
       dialog.showModal();
     }
+      this.isModalOpen = true;
   }
 
   closeModal(): void {
     this.isCategoryDropdownOpen = false;
-    const dialog = this.productDialog?.nativeElement;
-    if (dialog?.open) {
-      dialog.close();
-    }
+    // const dialog = this.productDialog?.nativeElement;
+    // if (dialog?.open) {
+    //   dialog.close();
+    // }
+     this.isModalOpen = false;
   }
 
   save(): void {

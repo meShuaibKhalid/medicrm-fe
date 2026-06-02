@@ -56,146 +56,6 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 
   `,
   styles: [`
-    .topbar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-      .logo{
-        height: 48px;
-      }
-    }
-    .brand-block h1 {
-      margin: 0;
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -.04em;
-      color: var(--ion-color-primary);
-    }
-    .brand-block span {
-      display: block;
-      color: var(--ion-color-primary);
-      font-size: .82rem;
-      font-weight: 600;
-    }
-    .search-block {
-      margin: 0;
-      padding: 0;
-    }
-    .utility-pill,
-    .icon-pill {
-    flex: 1;
-    border: 0;
-    background: #fff;
-    min-height: 42px;
-    border-radius: 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 0 5px;
-    font-weight: 700;
-    color: #222;
-    border: 1px solid #e3e6ef;
-    font-size: 12px;
-    max-width: 380px;
-    min-width: 130px;
-    }
-    .utility-pill ion-icon,
-    .icon-pill ion-icon {
-      font-size: 22px;
-      color: var(--ion-color-primary);
-    }
-    .action-pills {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      touch-action: pan-x;
-      -webkit-overflow-scrolling: touch;
-      margin-left: auto;
-    }
-    .action-pills::-webkit-scrollbar,
-    .nav-scroll::-webkit-scrollbar {
-      display: none;
-    }
-
-    .header-btn{
-    position: relative;
-    display: flex;
-    align-items: center;
-    background-color: #5e971a;
-    color: #fff;
-    padding: 7px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    line-height: 1;
-    margin-left: 6px;
-    height: fit-content;
-    white-space: nowrap;
-    &.instant-btn{
-      background-color: var(--ion-color-primary) !important;
-    }
-    &.action-btns{
-      button{
-        background: transparent;
-      }
-    }
-    ion-icon{
-      font-size: 25px;
-      margin-right: 4px;
-    }
-    }
-    .green-pill {
-      background: #7ea731;
-      color: #fff;
-      border-color: #7ea731;
-    }
-    .green-pill ion-icon {
-      color: #fff;
-    }
-    .primary-pill {
-      background: var(--ion-color-primary);
-      color: #fff;
-      border-color: var(--ion-color-primary);
-    }
-    .primary-pill ion-icon {
-      color: #fff;
-    }
-    .icon-pill {
-      width: 54px;
-      justify-content: center;
-      padding: 0;
-      flex: 0 0 54px;
-    }
-    .category-toolbar {
-      --background: #fff;
-      --min-height: 68px;
-    }
-    .nav-scroll {
-      display: flex;
-      justify-content: unset;
-      align-items: unset;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      padding: 0 5px;
-      .category-list{
-          display: flex;
-          justify-content: center;
-          align-items: unset;
-          flex-direction: row;
-          flex-wrap: nowrap;
-          padding: 0 5px;
-          flex-grow: 1;
-          position: relative;
-      }
-    }
-    .nav-link-btn {
-      --color: #222;
-      text-transform: none;
-      font-weight: 600;
-      min-width: max-content;
-    }
     .homepage-shell {
       padding-top: 12px;
     }
@@ -215,45 +75,22 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
       color: #666;
       max-width: 680px;
     }
-    .product-grid {
-      display:grid;
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-      gap: 18px;
-      margin-bottom: 24px;
-    }
     .info-list {
       overflow: hidden;
     }
-
     :host ::ng-deep{
-      ion-searchbar{
-        input{
-          background: transparent !important;
-          font-size: 12px !important  ;
+      .product-grid{
+        app-product-card{
+          height: auto !important;
+          ion-card{
+            height: 100% !important;
+            .badges{
+              display: none !important;
+            }
+          }
         }
       }
     }
-
-    @media (min-width: 648px) {
-      .product-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    @media (min-width: 992px) {
-      // .topbar {
-      //   grid-template-columns: 240px minmax(280px, 1fr) 330px auto;
-      // }
-      .product-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-    }
-    @media (min-width: 1280px) {
-      .product-grid {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-      }
-    }
-    
- 
   `],
 })
 export class HomePage {

@@ -52,7 +52,7 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
       padding: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 1.25rem;
       max-width: 800px;
       margin: 0 auto;
       font-family: 'Poppins', sans-serif;
@@ -63,7 +63,7 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
         gap: 10px;
         align-items: center;
         color: var(--ion-color-primary);
-        font-size: 1rem;
+        font-size: 14px;
         margin: 10px 0 0;
     }
 
@@ -80,7 +80,7 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
     .wishlist-item {
       background: var(--color-white-near-white);
       border-radius: var(--app-border-radius-large, 18px);
-      padding: 1.25rem;
+      padding: 1rem;
       box-shadow: 0 4px 16px rgba(0,0,0,0.03);
       border: 1px solid var(--color-soft-blue-gray);
       display: flex;
@@ -118,8 +118,8 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
 
     .item-title {
       margin: 0 0 4px;
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 600;
       color: var(--color-navy-black);
       line-height: 1.4;
       cursor: pointer;

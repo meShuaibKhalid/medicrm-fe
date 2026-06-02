@@ -58,124 +58,6 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
   </ion-content>
 `,
   styles: [`
-  .topbar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-      .logo{
-        height: 48px;
-      }
-    }
-    .brand-block h1 {
-      margin: 0;
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -.04em;
-      color: var(--ion-color-primary);
-    }
-    .brand-block span {
-      display: block;
-      color: var(--ion-color-primary);
-      font-size: .82rem;
-      font-weight: 600;
-    }
-    .search-block {
-      margin: 0;
-      padding: 0;
-    }
-    .utility-pill,
-    .icon-pill {
-    flex: 1;
-    border: 0;
-    background: #fff;
-    min-height: 42px;
-    border-radius: 12px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 0 5px;
-    font-weight: 700;
-    color: #222;
-    border: 1px solid #e3e6ef;
-    font-size: 12px;
-    max-width: 380px;
-    min-width: 130px;
-    }
-    .utility-pill ion-icon,
-    .icon-pill ion-icon {
-      font-size: 22px;
-      color: var(--ion-color-primary);
-    }
-    .action-pills {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      touch-action: pan-x;
-      -webkit-overflow-scrolling: touch;
-      margin-left: auto;
-    }
-    .action-pills::-webkit-scrollbar,
-    .nav-scroll::-webkit-scrollbar {
-      display: none;
-    }
-
-    .header-btn{
-    position: relative;
-    display: flex;
-    align-items: center;
-    background-color: #5e971a;
-    color: #fff;
-    padding: 7px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    line-height: 1;
-    margin-left: 6px;
-    height: fit-content;
-    white-space: nowrap;
-    &.instant-btn {
-      background-color: var(--ion-color-primary) !important;
-    }
-    &.action-btns {
-      button {
-        background: transparent;
-      }
-    }
-    ion-icon {
-      font-size: 25px;
-      margin-right: 4px;
-    }
-    }
-    .nav-scroll {
-      display: flex;
-      justify-content: unset;
-      align-items: unset;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      padding: 0 5px;
-      .category-list {
-          display: flex;
-          justify-content: center;
-          align-items: unset;
-          flex-direction: row;
-          flex-wrap: nowrap;
-          padding: 0 5px;
-          flex-grow: 1;
-          position: relative;
-      }
-    }
-
-       :host ::ng-deep{
-      ion-searchbar{
-        input{
-          background: transparent !important;
-          font-size: 12px !important  ;
-        }
-      }
-    }
-
     :host { --ion-background-color: var(--color-ice-blue); }
 
     .cart-page {
@@ -189,12 +71,12 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
     }
 
     .dvago-breadcrumb {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 13px;
-      color: var(--color-blue-gray);
-      margin-bottom: 0.5rem;
+     display: flex;
+    gap: 10px;
+    align-items: center;
+    color: var(--ion-color-primary);
+    font-size: 1rem;
+    margin: 10px 0 0;
     }
 
     .dvago-breadcrumb ion-icon {

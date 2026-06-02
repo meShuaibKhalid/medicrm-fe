@@ -2,7 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { IonBadge, IonButton, IonButtons, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonImg, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import {
+  IonBadge,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonImg,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
 import { switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
@@ -36,7 +48,9 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
     <ion-header class="ion-no-border">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button (click)="router.navigateByUrl('/home')"><ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon></ion-button>
+          <ion-button (click)="router.navigateByUrl('/home')"
+            ><ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon
+          ></ion-button>
         </ion-buttons>
         <ion-title>Product Detail</ion-title>
       </ion-toolbar>
@@ -48,135 +62,300 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
 
       <div class="page-shell state-card" *ngIf="!loading && loadError">
         <p>{{ loadError }}</p>
-        <ion-button shape="round" (click)="router.navigateByUrl('/home')">Back to Home</ion-button>
+        <ion-button shape="round" (click)="router.navigateByUrl('/home')"
+          >Back to Home</ion-button
+        >
       </div>
 
       <div *ngIf="product && !loading">
-      <div class="page-shell">
-        <ion-card class="soft-card">
-          <!-- Image -->
-          <div class="detail-image">
-            <ion-img [src]="product.image" [alt]="product.title"></ion-img>
-            <ion-badge
-              [color]="product.stock > 0 ? 'success' : 'medium'"
-              class="stock-overlay"
-            >
-              {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
-            </ion-badge>
-          </div>
-
-          <ion-card-content>
-            <!-- Brand pill -->
-            <a
-              *ngIf="product.brandSlug; else plainBrand"
-              class="brand-pill brand-link"
-              [routerLink]="['/brand', product.brandSlug]"
-            >
-              {{ product.brand }}
-            </a>
-            <ng-template #plainBrand>
-              <div class="brand-pill">{{ product.brand }}</div>
-            </ng-template>
-
-            <h1>{{ product.title }}</h1>
-
-            <!-- Price row -->
-            <div class="price-row">
-              <app-price-display
-                [price]="product.price"
-                [salePrice]="product.salePrice"
-                [salePercent]="product.salePercent"
-              ></app-price-display>
+        <div class="page-shell">
+          <ion-card class="soft-card">
+            <!-- Image -->
+            <div class="detail-image">
+              <ion-img [src]="product.image" [alt]="product.title"></ion-img>
+              <ion-badge
+                [color]="product.stock > 0 ? 'success' : 'medium'"
+                class="stock-overlay"
+              >
+                {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
+              </ion-badge>
             </div>
 
-            <ion-badge
-              *ngIf="product.prescriptionRequired"
-              color="warning"
-              class="rx-badge"
-            >
-              Prescription Required
-            </ion-badge>
+            <ion-card-content>
+              <!-- Brand pill -->
+              <a
+                *ngIf="product.brandSlug; else plainBrand"
+                class="brand-pill brand-link"
+                [routerLink]="['/brand', product.brandSlug]"
+              >
+                {{ product.brand }}
+              </a>
+              <ng-template #plainBrand>
+                <div class="brand-pill">{{ product.brand }}</div>
+              </ng-template>
 
-            <div class="divider"></div>
+              <h1>{{ product.title }}</h1>
 
-            <!-- Quantity -->
-            <div class="quantity-row">
-              <span class="qty-label">Quantity</span>
-              <div class="quantity-box">
-                <ion-button
-                  fill="outline"
-                  size="small"
-                  shape="round"
-                  (click)="decreaseQuantity()"
-                  >−</ion-button
-                >
-                <strong>{{ quantity }}</strong>
-                <ion-button
-                  fill="outline"
-                  size="small"
-                  shape="round"
-                  (click)="increaseQuantity()"
-                  >+</ion-button
-                >
+              <!-- Price row -->
+              <div class="price-row">
+                <app-price-display
+                  [price]="product.price"
+                  [salePrice]="product.salePrice"
+                  [salePercent]="product.salePercent"
+                ></app-price-display>
               </div>
-            </div>
 
-            <!-- Description -->
-            <div class="info-section">
-              <p class="info-label">Description</p>
-              <p class="info-text">{{ product.description }}</p>
-            </div>
-            <div class="info-section">
-              <p class="info-label">Used For</p>
-              <p class="info-text">{{ product.usedFor }}</p>
-            </div>
+              <ion-badge
+                *ngIf="product.prescriptionRequired"
+                color="warning"
+                class="rx-badge"
+              >
+                Prescription Required
+              </ion-badge>
 
-            <ion-button
-              expand="block"
-              shape="round"
-              class="cta-btn"
-              (click)="addToCart()"
+              <div class="divider"></div>
+
+              <!-- Quantity -->
+              <div class="quantity-row">
+                <span class="qty-label">Quantity</span>
+                <div class="quantity-box">
+                  <ion-button
+                    fill="outline"
+                    size="small"
+                    shape="round"
+                    (click)="decreaseQuantity()"
+                    >−</ion-button
+                  >
+                  <strong>{{ quantity }}</strong>
+                  <ion-button
+                    fill="outline"
+                    size="small"
+                    shape="round"
+                    (click)="increaseQuantity()"
+                    >+</ion-button
+                  >
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="info-section">
+                <p class="info-label">Description</p>
+                <p class="info-text">{{ product.description }}</p>
+              </div>
+              <div class="info-section">
+                <p class="info-label">Used For</p>
+                <p class="info-text">{{ product.usedFor }}</p>
+              </div>
+
+              <ion-button
+                expand="block"
+                shape="round"
+                class="cta-btn"
+                (click)="addToCart()"
+              >
+                <ion-icon name="cart-outline" slot="start"></ion-icon>
+                Add to Cart
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+
+          <!-- Related -->
+          <div class="section-header">
+            <h3>Related Products</h3>
+            <div class="section-line"></div>
+          </div>
+          <div class="product-grid">
+            <app-product-card
+              *ngFor="let item of relatedProducts"
+              [product]="item"
+              (addToCart)="addRelatedToCart($event)"
+              (openProduct)="openRelated($event)"
             >
-              <ion-icon name="cart-outline" slot="start"></ion-icon>
-              Add to Cart
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-
-        <!-- Related -->
-        <div class="section-header">
-          <h3>Related Products</h3>
-          <div class="section-line"></div>
+            </app-product-card>
+          </div>
         </div>
-        <div class="product-grid">
-          <app-product-card
-            *ngFor="let item of relatedProducts"
-            [product]="item"
-            (addToCart)="addRelatedToCart($event)"
-            (openProduct)="openRelated($event)"
-          >
-          </app-product-card>
-        </div>
-      </div>
       </div>
     </ion-content>
   `,
-  styles: [`
-    .detail-image { padding: 20px; background: linear-gradient(180deg,#eef8f5,#fff); }
-    ion-img { height: 220px; object-fit: contain; }
-    h1 { font-size: 1.2rem; margin: 0 0 6px; color:#173d52; }
-    .brand { color:#6b8490; margin:0 0 12px; }
-    .brand-link {
-      display: inline-flex;
-      align-items: center;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .badges, .quantity-box { display:flex; align-items:center; gap:10px; margin:14px 0; }
-    h3 { margin: 16px 0 6px; color:#173d52; }
-    .product-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-    .state-card { padding-top: 24px; color: #64748b; }
-  `],
+  styles: [
+    `
+      .detail-image {
+        padding: 20px;
+        background: linear-gradient(180deg, #eef8f5, #fff);
+      }
+      ion-img {
+        height: 220px;
+        object-fit: contain;
+      }
+      h1 {
+        font-size: 1.2rem;
+        margin: 0 0 6px;
+        color: #173d52;
+      }
+      .brand {
+        color: #6b8490;
+        margin: 0 0 12px;
+      }
+      .brand-link {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        cursor: pointer;
+        &:hover {
+          box-shadow: 0px 0px 2px 1px #079d6e;
+          transition: box-shadow 0.2s;
+        }
+      }
+      ion-title {
+        font-size: 1.2rem;
+      }
+      .badges,
+      .quantity-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 14px 0;
+      }
+      h3 {
+        margin: 16px 0 6px;
+        color: #173d52;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .state-card {
+        padding-top: 24px;
+        color: #64748b;
+      }
+      .soft-card {
+        display: flex;
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+      }
+      ion-card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        padding-top: 24px;
+      }
+      .detail-image {
+        position: relative;
+        padding: 32px 24px 24px;
+        background: linear-gradient(160deg, #eef8f5, #f8fcfa);
+        flex: 1;
+        display: flex;
+
+        ion-img {
+          object-fit: contain;
+          margin: auto;
+          aspect-ratio: 4 / 3;
+        }
+
+        .stock-overlay {
+          position: absolute;
+          top: 14px;
+          right: 14px;
+          border-radius: 20px;
+          font-size: 11px;
+        }
+      }
+
+      h1 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #0e2d3d;
+        margin-bottom: 10px;
+      }
+
+      .quantity-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 12px 0;
+        width: 100%;
+        .qty-label {
+          font-size: 13px;
+          font-weight: 500;
+          color: #4a6b78;
+        }
+        .quantity-box {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+      }
+
+      .cta-btn {
+        --border-radius: 14px;
+        font-weight: 600;
+        margin: auto 0 15px;
+        --background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+        --box-shadow: 0;
+      }
+
+      .info-section {
+        margin-bottom: 12px;
+      }
+      .info-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #0f6e56;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 4px;
+      }
+      .info-text {
+        font-size: 13.5px;
+        color: #4a6b78;
+        line-height: 1.6;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 12px 10px;
+        h3 {
+          font-size: 15px;
+          font-weight: 600;
+          white-space: nowrap;
+          color: #0e2d3d;
+        }
+        .section-line {
+          flex: 1;
+          height: 0.5px;
+          background: rgba(29, 158, 117, 0.15);
+        }
+      }
+      
+      ion-toolbar{
+        --min-height: unset;
+      }
+      :host ::ng-deep {
+        .product-grid {
+          app-product-card {
+            height: auto !important;
+            ion-card {
+              height: 100% !important;
+              .badges {
+                display: none !important;
+              }
+            }
+          }
+        }
+        .price-row {
+          .prices strong {
+            font-size: 22px !important;
+          }
+        }
+      }
+    `,
+  ],
 })
 export class ProductDetailPage {
   readonly router = inject(Router);
@@ -198,29 +377,33 @@ export class ProductDetailPage {
       this.loading = false;
     }
 
-    this.route.paramMap.pipe(
-      switchMap((params) => {
-        const slug = params.get('slug') ?? '';
-        this.quantity = 1;
-        this.loadError = '';
-        this.loading = !this.product || this.product.slug !== slug;
-        return this.productService.getProductBySlug(slug);
-      }),
-    ).subscribe((product) => {
-      if (!product) {
-        this.product = undefined;
-        this.relatedProducts = [];
-        this.loading = false;
-        this.loadError = 'Product not found or failed to load.';
-        return;
-      }
+    this.route.paramMap
+      .pipe(
+        switchMap((params) => {
+          const slug = params.get('slug') ?? '';
+          this.quantity = 1;
+          this.loadError = '';
+          this.loading = !this.product || this.product.slug !== slug;
+          return this.productService.getProductBySlug(slug);
+        }),
+      )
+      .subscribe((product) => {
+        if (!product) {
+          this.product = undefined;
+          this.relatedProducts = [];
+          this.loading = false;
+          this.loadError = 'Product not found or failed to load.';
+          return;
+        }
 
-      this.product = product;
-      this.loading = false;
-      this.productService.getFeaturedProducts().subscribe((products) => {
-        this.relatedProducts = products.filter((item) => item.slug !== product.slug).slice(0, 2);
+        this.product = product;
+        this.loading = false;
+        this.productService.getFeaturedProducts().subscribe((products) => {
+          this.relatedProducts = products
+            .filter((item) => item.slug !== product.slug)
+            .slice(0, 2);
+        });
       });
-    });
   }
 
   addToCart(): void {

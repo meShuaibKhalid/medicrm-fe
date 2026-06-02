@@ -7,6 +7,14 @@ import {
   IonInput,
   IonToggle,
   IonSearchbar,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonTitle,
+  IonIcon,
+  IonModal,
+  IonSelectOption,
 } from '@ionic/angular/standalone';
 import { CategoryService } from '../../../core/services/category.service';
 import { AdminService } from '../../../core/services/admin.service';
@@ -23,6 +31,14 @@ import { Category } from '../../../shared/models/app.models';
     IonInput,
     IonToggle,
     IonSearchbar,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonBackButton,
+    IonTitle,
+    IonIcon,
+    IonModal,
+    IonSelectOption,
   ],
   template: `
     <ion-content class="categories-content">
@@ -99,36 +115,42 @@ import { Category } from '../../../shared/models/app.models';
         </div>
       </div>
 
-      <dialog #categoryDialog class="admin-modal">
-        <div class="modal-head">
-          <span class="modal-title">{{
-            form.id ? 'Edit Category' : 'Add Category'
-          }}</span>
-          <button class="modal-close" (click)="closeModal()">×</button>
-        </div>
-        <div class="modal-body">
-          <div class="grid2">
-            <div class="field-group">
-              <label class="field-label">Name</label>
-              <ion-input
-                class="field-input"
-                [(ngModel)]="form.name"
-                placeholder="Category name"
-              ></ion-input>
-            </div>
-            <div class="field-group">
-              <label class="field-label">Slug</label>
-              <ion-input
-                class="field-input"
-                [(ngModel)]="form.slug"
-                placeholder="category-slug"
-              ></ion-input>
-            </div>
+      <!-- <dialog #categoryDialog class="admin-modal"> -->
+      <ion-modal
+        #categoryModal
+        [isOpen]="isModalOpen"
+        (didDismiss)="isModalOpen = false"
+      >
+        <ng-template>
+          <div class="modal-head">
+            <span class="modal-title">{{
+              form.id ? 'Edit Category' : 'Add Category'
+            }}</span>
+            <button class="modal-close" (click)="closeModal()">×</button>
           </div>
-          <div class="grid2">
-            <div class="field-group">
-              <label class="field-label">Parent category</label>
-              <div class="category-picker soft-card">
+          <div class="modal-body">
+            <div class="grid2">
+              <div class="field-group">
+                <label class="field-label">Name</label>
+                <ion-input
+                  class="field-input"
+                  [(ngModel)]="form.name"
+                  placeholder="Category name"
+                ></ion-input>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Slug</label>
+                <ion-input
+                  class="field-input"
+                  [(ngModel)]="form.slug"
+                  placeholder="category-slug"
+                ></ion-input>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field-group">
+                <label class="field-label">Parent category</label>
+                <!-- <div class="category-picker soft-card">
                 <div class="category-dropdown">
                   <input
                     type="text"
@@ -169,33 +191,56 @@ import { Category } from '../../../shared/models/app.models';
                   <p class="category-empty" *ngIf="filteredParentCategories.length === 0">No parent categories found.</p>
                 </div>
                 <p class="selected-category" *ngIf="selectedParentCategoryLabel">Selected: {{ selectedParentCategoryLabel }}</p>
+              </div> -->
+                <div class="category-picker soft-card">
+                  <ion-select
+                    [(ngModel)]="form.parentId"
+                    [ngModelOptions]="{ standalone: true }"
+                    placeholder="Select parent category"
+                    interface="popover"
+                    (ionChange)="onParentCategoryChange($event)"
+                  >
+                    <ion-select-option [value]="null">None</ion-select-option>
+                    <ion-select-option
+                      *ngFor="let cat of parentCategories"
+                      [value]="cat.id"
+                    >
+                      {{ cat.name }}
+                    </ion-select-option>
+                  </ion-select>
+
+                  <!-- <p class="selected-category" *ngIf="selectedParentCategoryLabel">
+    Selected: {{ selectedParentCategoryLabel }}
+  </p> -->
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Status</label>
+                <div class="toggle-row">
+                  <span class="toggle-label">Active</span>
+                  <ion-toggle
+                    [(ngModel)]="form.isActive"
+                    class="pink-toggle"
+                  ></ion-toggle>
+                </div>
               </div>
             </div>
-            <div class="field-group">
-              <label class="field-label">Status</label>
-              <div class="toggle-row">
-                <span class="toggle-label">Active</span>
-                <ion-toggle
-                  [(ngModel)]="form.isActive"
-                  class="pink-toggle"
-                ></ion-toggle>
-              </div>
+            <div class="modal-footer">
+              <ion-button fill="clear" color="medium" (click)="closeModal()"
+                >Cancel</ion-button
+              >
+              <ion-button
+                shape="round"
+                [disabled]="!form.name || !form.slug"
+                (click)="save()"
+              >
+                {{ form.id ? 'Update Category' : 'Save Category' }}
+              </ion-button>
             </div>
           </div>
-          <div class="modal-footer">
-            <ion-button fill="clear" color="medium" (click)="closeModal()"
-              >Cancel</ion-button
-            >
-            <ion-button
-              shape="round"
-              [disabled]="!form.name || !form.slug"
-              (click)="save()"
-            >
-              {{ form.id ? 'Update Category' : 'Save Category' }}
-            </ion-button>
-          </div>
-        </div>
-      </dialog>
+        </ng-template>
+      </ion-modal>
+      <!-- </dialog> -->
     </ion-content>
   `,
   styles: [
@@ -476,11 +521,11 @@ import { Category } from '../../../shared/models/app.models';
         display: block;
         margin-bottom: 5px;
       }
-    .field-input {
-      background: #ffffff;
-      border: 1.5px solid #fae8ef;
-      border-radius: 12px;
-      --padding-start: 14px;
+      .field-input {
+        background: #ffffff;
+        border: 1.5px solid #fae8ef;
+        border-radius: 12px;
+        --padding-start: 14px;
         color: #000000;
         font-size: 14px;
       }
@@ -510,11 +555,12 @@ import { Category } from '../../../shared/models/app.models';
       }
 
       .category-picker {
-        padding: 16px;
-        border-radius: 20px;
+        border-radius: 8px;
         background: #fff;
-        position: relative;
-        z-index: 50;
+        border: 1.5px solid #fae8ef;
+      }
+      ion-select {
+        --padding-start: 14px;
       }
 
       .category-dropdown {
@@ -611,6 +657,7 @@ export class AdminCategoriesPage {
   parentCategorySearch = '';
   isParentCategoryDropdownOpen = false;
 
+  isModalOpen = false;
   search = '';
   page = 1;
   limit = 10;
@@ -624,6 +671,16 @@ export class AdminCategoriesPage {
   constructor() {
     this.load();
     this.loadParents();
+  }
+
+  onParentCategoryChange(event: any) {
+    const selectedId = event.detail.value;
+    if (!selectedId) {
+      this.form.parentId = null;
+      return;
+    }
+    const cat = this.parentCategories.find((c) => c.id === selectedId);
+    this.form.parentId = cat?.id ?? null;
   }
 
   load(): void {
@@ -651,12 +708,16 @@ export class AdminCategoriesPage {
   get filteredParentCategories(): Category[] {
     const term = this.parentCategorySearch.trim().toLowerCase();
     if (!term) return this.parentCategories;
-    return this.parentCategories.filter((category) => category.name.toLowerCase().includes(term));
+    return this.parentCategories.filter((category) =>
+      category.name.toLowerCase().includes(term),
+    );
   }
 
   get selectedParentCategoryLabel(): string {
     if (!this.form.parentId) return 'None';
-    const category = this.parentCategories.find((item) => item.id === this.form.parentId);
+    const category = this.parentCategories.find(
+      (item) => item.id === this.form.parentId,
+    );
     return category ? category.name : 'None';
   }
 
@@ -667,25 +728,30 @@ export class AdminCategoriesPage {
 
   openAddModal(): void {
     this.resetForm();
-    this.categoryDialog.nativeElement.showModal();
+    // this.categoryDialog.nativeElement.showModal();
+    // this.openModal();
+    this.isModalOpen = true;
   }
 
   edit(category: Category): void {
     this.form = { ...category };
     this.populateParentCategorySearch();
-    this.categoryDialog.nativeElement.showModal();
+    // this.categoryDialog.nativeElement.showModal();
+    this.isModalOpen = true;
   }
 
   closeModal(): void {
+    this.isModalOpen = false;
     this.isParentCategoryDropdownOpen = false;
-    this.categoryDialog.nativeElement.close();
+    // this.categoryDialog.nativeElement.close();
   }
 
   save(): void {
     if (!this.form.name || !this.form.slug) return;
 
-    const parent = this.parentCategories.find((c) => c.id === this.form.parentId)
-      ?? this.categories.find((c) => c.id === this.form.parentId);
+    const parent =
+      this.parentCategories.find((c) => c.id === this.form.parentId) ??
+      this.categories.find((c) => c.id === this.form.parentId);
     this.form.level = parent ? parent.level + 1 : 0;
     this.form.parentId = this.form.parentId || null;
 
@@ -732,7 +798,9 @@ export class AdminCategoriesPage {
   }
 
   private populateParentCategorySearch(): void {
-    const category = this.parentCategories.find((item) => item.id === this.form.parentId);
+    const category = this.parentCategories.find(
+      (item) => item.id === this.form.parentId,
+    );
     this.parentCategorySearch = category?.name ?? '';
   }
 
