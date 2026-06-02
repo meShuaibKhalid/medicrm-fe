@@ -26,7 +26,7 @@ import { IonBadge } from '@ionic/angular/standalone';
         text-transform: capitalize; 
             color: var(--ion-color-primary);
     font-weight: 700;
-    font-size: .9rem;
+    font-size: 14px;
     transform: translateY(2px);
     }
     span { font-size:.82rem; }

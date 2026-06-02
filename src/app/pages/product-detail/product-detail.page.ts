@@ -14,7 +14,23 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonBadge, IonButton, IonButtons, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonImg, IonTitle, IonToolbar, ProductCardComponent, PriceDisplayComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonBadge,
+    IonButton,
+    IonButtons,
+    IonCard,
+    IonCardContent,
+    IonContent,
+    IonHeader,
+    IonIcon,
+    IonImg,
+    IonTitle,
+    IonToolbar,
+    ProductCardComponent,
+    PriceDisplayComponent,
+  ],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar>
@@ -37,31 +53,99 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
       <div *ngIf="product && !loading">
       <div class="page-shell">
         <ion-card class="soft-card">
-          <div class="detail-image"><ion-img [src]="product.image" [alt]="product.title"></ion-img></div>
+          <!-- Image -->
+          <div class="detail-image">
+            <ion-img [src]="product.image" [alt]="product.title"></ion-img>
+            <ion-badge
+              [color]="product.stock > 0 ? 'success' : 'medium'"
+              class="stock-overlay"
+            >
+              {{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}
+            </ion-badge>
+          </div>
+
           <ion-card-content>
+            <!-- Brand pill -->
+            <div class="brand-pill">{{ product.brand }}</div>
+
             <h1>{{ product.title }}</h1>
-            <p class="brand">{{ product.brand }}</p>
-            <app-price-display [price]="product.price" [salePrice]="product.salePrice" [salePercent]="product.salePercent"></app-price-display>
-            <div class="badges">
-              <ion-badge [color]="product.stock > 0 ? 'success' : 'medium'">{{ product.stock > 0 ? 'In Stock' : 'Out of Stock' }}</ion-badge>
-              <ion-badge *ngIf="product.prescriptionRequired" color="warning">Prescription Required</ion-badge>
+
+            <!-- Price row -->
+            <div class="price-row">
+              <app-price-display
+                [price]="product.price"
+                [salePrice]="product.salePrice"
+                [salePercent]="product.salePercent"
+              ></app-price-display>
             </div>
-            <div class="quantity-box">
-              <ion-button fill="outline" size="small" (click)="decreaseQuantity()">-</ion-button>
-              <strong>{{ quantity }}</strong>
-              <ion-button fill="outline" size="small" (click)="increaseQuantity()">+</ion-button>
+
+            <ion-badge
+              *ngIf="product.prescriptionRequired"
+              color="warning"
+              class="rx-badge"
+            >
+              Prescription Required
+            </ion-badge>
+
+            <div class="divider"></div>
+
+            <!-- Quantity -->
+            <div class="quantity-row">
+              <span class="qty-label">Quantity</span>
+              <div class="quantity-box">
+                <ion-button
+                  fill="outline"
+                  size="small"
+                  shape="round"
+                  (click)="decreaseQuantity()"
+                  >−</ion-button
+                >
+                <strong>{{ quantity }}</strong>
+                <ion-button
+                  fill="outline"
+                  size="small"
+                  shape="round"
+                  (click)="increaseQuantity()"
+                  >+</ion-button
+                >
+              </div>
             </div>
-            <ion-button expand="block" shape="round" (click)="addToCart()">Add to Cart</ion-button>
-            <h3>Description</h3>
-            <p>{{ product.description }}</p>
-            <h3>Used For</h3>
-            <p>{{ product.usedFor }}</p>
+
+            <!-- Description -->
+            <div class="info-section">
+              <p class="info-label">Description</p>
+              <p class="info-text">{{ product.description }}</p>
+            </div>
+            <div class="info-section">
+              <p class="info-label">Used For</p>
+              <p class="info-text">{{ product.usedFor }}</p>
+            </div>
+
+            <ion-button
+              expand="block"
+              shape="round"
+              class="cta-btn"
+              (click)="addToCart()"
+            >
+              <ion-icon name="cart-outline" slot="start"></ion-icon>
+              Add to Cart
+            </ion-button>
           </ion-card-content>
         </ion-card>
 
-        <div class="section-title"><h3>Related Products</h3></div>
+        <!-- Related -->
+        <div class="section-header">
+          <h3>Related Products</h3>
+          <div class="section-line"></div>
+        </div>
         <div class="product-grid">
-          <app-product-card *ngFor="let item of relatedProducts" [product]="item" (addToCart)="addRelatedToCart($event)" (openProduct)="openRelated($event)"></app-product-card>
+          <app-product-card
+            *ngFor="let item of relatedProducts"
+            [product]="item"
+            (addToCart)="addRelatedToCart($event)"
+            (openProduct)="openRelated($event)"
+          >
+          </app-product-card>
         </div>
       </div>
       </div>
@@ -126,8 +210,14 @@ export class ProductDetailPage {
   addToCart(): void {
     if (this.product) {
       if (!this.authService.isLoggedIn()) {
-        this.cartService.setPendingItem(this.product, this.quantity, this.router.url);
-        this.router.navigate(['/register'], { queryParams: { redirectTo: this.router.url } });
+        this.cartService.setPendingItem(
+          this.product,
+          this.quantity,
+          this.router.url,
+        );
+        this.router.navigate(['/register'], {
+          queryParams: { redirectTo: this.router.url },
+        });
         return;
       }
       this.cartService.addItem(this.product, this.quantity);
@@ -137,7 +227,9 @@ export class ProductDetailPage {
   addRelatedToCart(product: Product): void {
     if (!this.authService.isLoggedIn()) {
       this.cartService.setPendingItem(product, 1, this.router.url);
-      this.router.navigate(['/register'], { queryParams: { redirectTo: this.router.url } });
+      this.router.navigate(['/register'], {
+        queryParams: { redirectTo: this.router.url },
+      });
       return;
     }
     this.cartService.addItem(product, 1);

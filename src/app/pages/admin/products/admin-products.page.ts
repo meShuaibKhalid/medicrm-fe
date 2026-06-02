@@ -1,7 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IonAlert, IonButton, IonContent, IonInput, IonItem, IonLabel, IonSearchbar, IonTextarea, IonToggle } from '@ionic/angular/standalone';
+import { IonAlert } from '@ionic/angular/standalone';
+import { RouterLink } from '@angular/router';
+import { IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonSearchbar, IonSelect, IonSelectOption, IonTextarea, IonToggle } from '@ionic/angular/standalone';
+import { ProductService } from '../../../core/services/product.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { Product, Category } from '../../../shared/models/app.models';
@@ -21,7 +24,8 @@ import { Product, Category } from '../../../shared/models/app.models';
     IonItem, 
     IonLabel, 
     IonTextarea, 
-    IonToggle
+    IonToggle,
+    IonIcon
   ],
   template: `
     <ion-content>
@@ -214,7 +218,201 @@ import { Product, Category } from '../../../shared/models/app.models';
           (didDismiss)="closeDeleteConfirm()"
         ></ion-alert>
       </div>
-    </ion-content>
+      <ion-searchbar 
+        class="theme-search" 
+        placeholder="Search products..." 
+        [(ngModel)]="search" 
+        (ionInput)="page = 1; load()"
+        mode="md">
+      </ion-searchbar>
+    </div>
+
+    <span class="section-label">ALL PRODUCTS</span>
+
+    <div class="list-panel-container">
+      
+      <div class="product-list-item" *ngFor="let product of products">
+        
+        <div class="product-info-block">
+          <h3 class="product-name">{{ product.title }}</h3>
+          <span class="product-brand">{{ product.brand | uppercase }}</span>
+          
+          <div class="meta-row">
+            <span class="status-dot" [class.is-inactive]="!product.isActive"></span>
+            <span class="price-text">Rs. {{ (product.salePrice ?? product.price) | number:'1.0-2' }}</span>
+            <span class="divider">•</span>
+            <span class="stock-text">Stock: {{ product.stock }}</span>
+            <span class="divider">•</span>
+            <span class="badge-tag" [class.active-tag]="product.isActive">
+              {{ product.isActive ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="product-actions-block">
+          <button class="btn-action-edit" (click)="edit(product)">EDIT</button>
+          <button class="btn-action-delete" (click)="deleteProduct(product.id)">DELETE</button>
+        </div>
+
+      </div>
+
+      <div class="empty-state-row" *ngIf="products.length === 0">
+        <p>No products found.</p>
+      </div>
+
+    </div>
+
+    <div class="pagination-footer" *ngIf="totalPages > 1">
+      <button class="page-nav" [disabled]="page === 1" (click)="goToPage(page - 1)">
+        <ion-icon name="chevron-back-outline"></ion-icon> Previous
+      </button>
+      <span class="page-info">Page {{ page }} of {{ totalPages }}</span>
+      <button class="page-nav" [disabled]="page === totalPages" (click)="goToPage(page + 1)">
+        Next <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </div>
+
+  <!-- Dialog Modal for Add/Edit Product -->
+     <dialog #productDialog class="admin-modal matching-theme">
+  <div class="modal-content-wrapper">
+    
+    <div class="modal-header">
+      <h3 class="modal-heading">{{ form.value.id ? 'Edit Product' : 'Add Product' }}</h3>
+      <button type="button" class="close-circle-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="modal-body-scroll">
+      <form [formGroup]="form">
+        
+        <div class="modal-grid-2">
+          <div class="form-field-group">
+            <label class="form-field-label">NAME *</label>
+            <div class="custom-input-box">
+              <ion-input formControlName="title" placeholder="Product Title"></ion-input>
+            </div>
+          </div>
+          <div class="form-field-group">
+            <label class="form-field-label">SLUG *</label>
+            <div class="custom-input-box">
+              <ion-input formControlName="slug" placeholder="product-slug"></ion-input>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-grid-2">
+          <div class="form-field-group">
+            <label class="form-field-label">BRAND</label>
+            <div class="custom-input-box">
+              <ion-input formControlName="brand" placeholder="Brand Name"></ion-input>
+            </div>
+          </div>
+          <div class="form-field-group">
+            <label class="form-field-label">CATEGORY *</label>
+            <div class="custom-input-box dynamic-select-box">
+              <ion-select formControlName="primaryCategoryId" interface="popover" placeholder="Select">
+                <ion-select-option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </ion-select-option>
+              </ion-select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-grid-2">
+          <div class="form-field-group">
+            <label class="form-field-label">PRICE *</label>
+            <div class="custom-input-box">
+              <ion-input type="number" formControlName="price" placeholder="Rs. 0.00"></ion-input>
+            </div>
+          </div>
+          <div class="form-field-group">
+            <label class="form-field-label">SALE PRICE</label>
+            <div class="custom-input-box">
+              <ion-input type="number" formControlName="salePrice" placeholder="Rs. 0.00"></ion-input>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-grid-2">
+          <div class="form-field-group">
+            <label class="form-field-label">SALE PERCENT</label>
+            <div class="custom-input-box">
+              <ion-input type="number" formControlName="salePercent" placeholder="0"></ion-input>
+            </div>
+          </div>
+          <div class="form-field-group">
+            <label class="form-field-label">STOCK</label>
+            <div class="custom-input-box">
+              <ion-input type="number" formControlName="stock" placeholder="0"></ion-input>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-grid-2">
+          <div class="form-field-group">
+            <label class="form-field-label">MAX ORDER</label>
+            <div class="custom-input-box">
+              <ion-input type="number" formControlName="maxOrder" placeholder="10"></ion-input>
+            </div>
+          </div>
+          <div class="form-field-group">
+            <label class="form-field-label">USED FOR</label>
+            <div class="custom-input-box">
+              <ion-input formControlName="usedFor" placeholder="Fever, pain, etc."></ion-input>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-field-group full-width-field">
+          <label class="form-field-label">IMAGE URL</label>
+          <div class="custom-input-box">
+            <ion-input formControlName="image" placeholder="https://example.com/image.jpg"></ion-input>
+          </div>
+        </div>
+
+        <div class="form-field-group full-width-field">
+          <label class="form-field-label">DESCRIPTION</label>
+          <div class="custom-input-box text-area-box">
+            <ion-textarea formControlName="description" rows="3" placeholder="Enter product description..."></ion-textarea>
+          </div>
+        </div>
+
+        <div class="modal-grid-2 alignment-fix">
+          <div class="form-field-group text-row-layout">
+            <label class="form-field-label">PRESCRIPTION REQUIRED</label>
+            <div class="custom-toggle-container">
+              <span class="toggle-state-text">
+                {{ form.get('prescriptionRequired')?.value ? 'Required' : 'None' }}
+              </span>
+              <ion-toggle formControlName="prescriptionRequired" class="emerald-toggle"></ion-toggle>
+            </div>
+          </div>
+          
+          <div class="form-field-group text-row-layout">
+            <label class="form-field-label">STATUS</label>
+            <div class="custom-toggle-container">
+              <span class="toggle-state-text">
+                {{ form.get('isActive')?.value ? 'Active' : 'Inactive' }}
+              </span>
+              <ion-toggle formControlName="isActive" class="emerald-toggle"></ion-toggle>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-action-footer">
+          <button type="button" class="cancel-flat-btn" (click)="closeModal()">CANCEL</button>
+          <button type="submit" class="save-theme-btn" [disabled]="form.invalid" (click)="save()">
+            {{ form.value.id ? 'UPDATE CATEGORY' : 'SAVE CATEGORY' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+    
+  </div>
+</dialog>
+  </div>
+</ion-content>
   `,
   styles: [`
     .page-shell {

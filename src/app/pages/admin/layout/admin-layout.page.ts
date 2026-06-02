@@ -30,13 +30,16 @@ import { AuthService } from '../../../core/services/auth.service';
       </ion-menu>
 
       <div class="ion-page" id="admin-content">
-        <ion-header class="ion-no-border">
+        <!-- <ion-header class="ion-no-border">
           <ion-toolbar>
             <ion-menu-button slot="start"></ion-menu-button>
             <ion-title>Admin Panel</ion-title>
           </ion-toolbar>
-        </ion-header>
-        <ion-router-outlet></ion-router-outlet>
+        </ion-header> -->
+        <ion-content>
+
+          <ion-router-outlet></ion-router-outlet>
+        </ion-content>
       </div>
     </ion-split-pane>
   `,
