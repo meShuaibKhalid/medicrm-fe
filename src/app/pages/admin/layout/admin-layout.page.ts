@@ -17,6 +17,7 @@ import { AuthService } from '../../../core/services/auth.service';
             <ion-item routerLink="/admin/dashboard">Dashboard</ion-item>
             <ion-item routerLink="/admin/products">Products</ion-item>
             <ion-item routerLink="/admin/categories">Categories</ion-item>
+            <ion-item routerLink="/admin/brands">Brands</ion-item>
             <ion-item routerLink="/admin/orders">Orders</ion-item>
             <ion-item routerLink="/admin/users">Users</ion-item>
             <ion-item routerLink="/home">
@@ -53,4 +54,3 @@ export class AdminLayoutPage {
     this.router.navigateByUrl('/home');
   }
 }
-

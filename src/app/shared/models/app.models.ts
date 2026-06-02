@@ -5,6 +5,8 @@ export interface Product {
   description: string;
   image: string;
   brand: string;
+  brandId?: string | null;
+  brandSlug?: string;
   price: number;
   salePrice?: number;
   salePercent?: number;
@@ -15,6 +17,14 @@ export interface Product {
   categoryIds: string[];
   primaryCategoryId: string;
   isActive: boolean;
+}
+
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  createdAt?: string;
 }
 
 export interface Category {

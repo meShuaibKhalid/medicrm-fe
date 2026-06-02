@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnChanges, inject, Input, Output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { IonBadge, IonCard, IonCardContent, IonIcon, IonImg } from '@ionic/angular/standalone';
 import { Product } from '../../models/app.models';
 import { PriceDisplayComponent } from '../price-display/price-display.component';
@@ -8,7 +9,7 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, IonBadge, IonCard, IonCardContent, IonIcon, IonImg, PriceDisplayComponent],
+  imports: [CommonModule, RouterLink, IonBadge, IonCard, IonCardContent, IonIcon, IonImg, PriceDisplayComponent],
   template: `
     <ion-card class="product-card soft-card">
       <button class="wishlist-btn" type="button" (click)="toggleWishlist($event)">
@@ -26,7 +27,17 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
         <div class="meta" (click)="openProduct.emit(product)">
           <h3>{{ product.title }}</h3>
           <div class="badges-container">
-            <p>{{ product.brand }}</p>
+            <a
+              *ngIf="product.brandSlug; else plainBrand"
+              class="brand-link"
+              [routerLink]="['/brand', product.brandSlug]"
+              (click)="$event.stopPropagation()"
+            >
+              {{ product.brand }}
+            </a>
+            <ng-template #plainBrand>
+              <p>{{ product.brand }}</p>
+            </ng-template>
             
 
           </div>
@@ -144,6 +155,17 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
       justify-content:space-between;
        margin-bottom: 3px;
        height: 38px;
+    }
+    .brand-link {
+      font-size: 12px;
+      color: #728090;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-decoration: none;
     }
     .badges {
       display:flex;

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { Category, Order, OrderStatus, Product, User } from '../../shared/models/app.models';
+import { Brand, Category, Order, OrderStatus, Product, User } from '../../shared/models/app.models';
 import { environment } from '../../../environments/environment';
 import { ApiResponse, PaginatedResult } from './api.models';
 
@@ -87,6 +87,21 @@ export class AdminService {
     );
   }
 
+  getAdminBrands(params?: { search?: string; page?: number; limit?: number }): Observable<PaginatedResult<Brand>> {
+    let httpParams = new HttpParams()
+      .set('page', String(params?.page ?? 1))
+      .set('limit', String(params?.limit ?? 20));
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+    return this.http.get<ApiResponse<PaginatedResult<any>>>(`${this.baseUrl}/brands`, { params: httpParams }).pipe(
+      map((res) => ({
+        items: res.data.items.map((b: any) => ({ ...b, id: b._id || b.id })),
+        pagination: res.data.pagination,
+      }))
+    );
+  }
+
   updateOrderStatus(id: string, status: OrderStatus): Observable<Order | undefined> {
     return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/orders/${id}/status`, { status }).pipe(
       map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
@@ -124,5 +139,21 @@ export class AdminService {
 
   deleteCategory(_id: string): Observable<boolean> {
     return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/categories/${_id}`).pipe(map(() => true));
+  }
+
+  createBrand(brand: Brand): Observable<Brand> {
+    return this.http.post<ApiResponse<any>>(`${this.baseUrl}/brands`, brand).pipe(
+      map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
+    );
+  }
+
+  updateBrand(brand: Brand): Observable<Brand> {
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/brands/${brand.id}`, brand).pipe(
+      map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
+    );
+  }
+
+  deleteBrand(_id: string): Observable<boolean> {
+    return this.http.delete<ApiResponse<any>>(`${this.baseUrl}/brands/${_id}`).pipe(map(() => true));
   }
 }

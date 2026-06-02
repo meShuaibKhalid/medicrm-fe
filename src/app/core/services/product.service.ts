@@ -8,6 +8,7 @@ import { ApiResponse, PaginatedResult } from './api.models';
 
 export interface ProductQueryParams {
   categorySlug?: string | null;
+  brandSlug?: string | null;
   search?: string;
   inStock?: boolean;
   prescriptionRequired?: boolean;
@@ -66,6 +67,9 @@ export class ProductService {
       httpParams = httpParams.set('categorySlug', params.categorySlug);
       httpParams = httpParams.set('includeDescendants', String(params.includeDescendants ?? true));
     }
+    if (params?.brandSlug) {
+      httpParams = httpParams.set('brandSlug', params.brandSlug);
+    }
     if (params?.inStock) {
       httpParams = httpParams.set('inStock', 'true');
     }
@@ -107,6 +111,9 @@ export class ProductService {
     if (params?.categorySlug) {
       httpParams = httpParams.set('categorySlug', params.categorySlug);
       httpParams = httpParams.set('includeDescendants', String(params.includeDescendants ?? true));
+    }
+    if (params?.brandSlug) {
+      httpParams = httpParams.set('brandSlug', params.brandSlug);
     }
     if (params?.inStock) {
       httpParams = httpParams.set('inStock', 'true');
@@ -192,6 +199,8 @@ export class ProductService {
       description: product.description ?? '',
       image: product.image ?? '',
       brand: product.brand ?? '',
+      brandId: product.brandId ? String(product.brandId._id ?? product.brandId) : undefined,
+      brandSlug: product.brandSlug ?? '',
       price: Number(product.price ?? 0),
       salePrice: Number(product.salePrice ?? product.price ?? 0),
       salePercent: Number(product.salePercent ?? 0),

@@ -2,10 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnDestroy, inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonAlert } from '@ionic/angular/standalone';
-import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonSearchbar, IonTextarea, IonToggle } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonSearchbar, IonSelect, IonSelectOption, IonTextarea, IonToggle } from '@ionic/angular/standalone';
 import { AdminService } from '../../../core/services/admin.service';
 import { CategoryService } from '../../../core/services/category.service';
-import { Product, Category } from '../../../shared/models/app.models';
+import { Brand, Product, Category } from '../../../shared/models/app.models';
+import { BrandService } from '../../../core/services/brand.service';
+import { toSlug } from '../../../shared/utils/slug';
 
 @Component({
   selector: 'app-admin-products',
@@ -21,6 +23,8 @@ import { Product, Category } from '../../../shared/models/app.models';
     IonInput, 
     IonItem, 
     IonLabel, 
+    IonSelect,
+    IonSelectOption,
     IonTextarea, 
     IonToggle,
   ],
@@ -89,18 +93,21 @@ import { Product, Category } from '../../../shared/models/app.models';
               <div class="modal-grid-2">
                 <ion-item class="soft-card">
                   <ion-label position="stacked">Title *</ion-label>
-                  <ion-input formControlName="title" placeholder="Product Title"></ion-input>
+                  <ion-input formControlName="title" placeholder="Product Title" (ionInput)="onTitleInput()"></ion-input>
                 </ion-item>
                 <ion-item class="soft-card">
                   <ion-label position="stacked">Slug *</ion-label>
-                  <ion-input formControlName="slug" placeholder="product-slug"></ion-input>
+                  <ion-input formControlName="slug" placeholder="product-slug" (ionInput)="onSlugInput()"></ion-input>
                 </ion-item>
               </div>
 
               <div class="modal-grid-2">
                 <ion-item class="soft-card">
                   <ion-label position="stacked">Brand</ion-label>
-                  <ion-input formControlName="brand" placeholder="Brand Name"></ion-input>
+                  <ion-select formControlName="brandId" interface="popover" placeholder="Select brand">
+                    <ion-select-option value="">No Brand</ion-select-option>
+                    <ion-select-option *ngFor="let brand of brands" [value]="brand.id">{{ brand.name }}</ion-select-option>
+                  </ion-select>
                 </ion-item>
                 <div class="category-picker soft-card">
                   <label class="field-label">Category *</label>
@@ -356,18 +363,22 @@ import { Product, Category } from '../../../shared/models/app.models';
 export class AdminProductsPage implements OnDestroy {
   private readonly adminService = inject(AdminService);
   private readonly categoryService = inject(CategoryService);
+  private readonly brandService = inject(BrandService);
   private readonly fb = inject(FormBuilder);
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   search = '';
   products: Product[] = [];
   categories: Category[] = [];
+  brands: Brand[] = [];
   categorySearch = '';
   isCategoryDropdownOpen = false;
   imagePreviewUrl = '';
   selectedImageName = '';
   private selectedImageFile: File | null = null;
   private imageObjectUrl: string | null = null;
+  private autoSlugValue = '';
+  private slugManuallyEdited = false;
 
   page = 1;
   limit = 10;
@@ -379,7 +390,8 @@ export class AdminProductsPage implements OnDestroy {
   form = this.fb.group({
     id: [''],
     title: ['', Validators.required],
-    slug: ['', Validators.required],
+    slug: [''],
+    brandId: [''],
     brand: [''],
     description: [''],
     image: [''],
@@ -401,6 +413,9 @@ export class AdminProductsPage implements OnDestroy {
     this.categoryService.getCategories().subscribe((categories) => {
       this.categories = categories
         .sort((a, b) => a.name.localeCompare(b.name));
+    });
+    this.brandService.getBrands().subscribe((brands) => {
+      this.brands = brands.sort((a, b) => a.name.localeCompare(b.name));
     });
   }
 
@@ -461,7 +476,8 @@ export class AdminProductsPage implements OnDestroy {
       id: product.id,
       title: product.title,
       slug: product.slug,
-      brand: product.brand,
+      brandId: product.brandId || '',
+      brand: '',
       description: product.description,
       image: product.image,
       price: product.price,
@@ -474,6 +490,8 @@ export class AdminProductsPage implements OnDestroy {
       prescriptionRequired: product.prescriptionRequired,
       isActive: product.isActive,
     });
+    this.autoSlugValue = '';
+    this.slugManuallyEdited = false;
     this.selectedImageFile = null;
     this.selectedImageName = '';
     this.setImagePreview(product.image || '');
@@ -519,6 +537,7 @@ export class AdminProductsPage implements OnDestroy {
       id: '',
       title: '',
       slug: '',
+      brandId: '',
       brand: '',
       description: '',
       image: '',
@@ -532,6 +551,8 @@ export class AdminProductsPage implements OnDestroy {
       prescriptionRequired: false,
       isActive: true,
     });
+    this.autoSlugValue = '';
+    this.slugManuallyEdited = false;
     this.selectedImageFile = null;
     this.selectedImageName = '';
     this.categorySearch = '';
@@ -562,6 +583,28 @@ export class AdminProductsPage implements OnDestroy {
     input.value = '';
   }
 
+  onTitleInput(): void {
+    if (this.form.value.id) return;
+
+    const title = this.form.value.title || '';
+    const generatedSlug = toSlug(title);
+    if (!generatedSlug) return;
+
+    const currentSlug = this.form.value.slug || '';
+    if (!currentSlug || currentSlug === this.autoSlugValue || !this.slugManuallyEdited) {
+      this.form.patchValue({ slug: generatedSlug }, { emitEvent: false });
+      this.autoSlugValue = generatedSlug;
+      this.slugManuallyEdited = false;
+    }
+  }
+
+  onSlugInput(): void {
+    if (this.form.value.id) return;
+
+    const currentSlug = toSlug(this.form.value.slug || '');
+    this.slugManuallyEdited = Boolean(currentSlug && currentSlug !== this.autoSlugValue);
+  }
+
   private populateCategorySearch(categoryId: string): void {
     const category = this.categories.find((item) => item.id === categoryId);
     this.categorySearch = category ? category.name : '';
@@ -569,9 +612,11 @@ export class AdminProductsPage implements OnDestroy {
 
   private buildProductFormData(): FormData {
     const value = this.form.getRawValue();
+    const slug = value.slug?.trim() || toSlug(value.title || '');
     const formData = new FormData();
     formData.append('title', value.title || '');
-    formData.append('slug', value.slug || '');
+    formData.append('slug', slug);
+    formData.append('brandId', value.brandId || '');
     formData.append('brand', value.brand || '');
     formData.append('description', value.description || '');
     formData.append('image', value.image || '');

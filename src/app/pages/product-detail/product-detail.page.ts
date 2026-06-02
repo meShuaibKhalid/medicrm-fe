@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonBadge, IonButton, IonButtons, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonImg, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
@@ -28,6 +28,7 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
     IonImg,
     IonTitle,
     IonToolbar,
+    RouterLink,
     ProductCardComponent,
     PriceDisplayComponent,
   ],
@@ -66,7 +67,16 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
 
           <ion-card-content>
             <!-- Brand pill -->
-            <div class="brand-pill">{{ product.brand }}</div>
+            <a
+              *ngIf="product.brandSlug; else plainBrand"
+              class="brand-pill brand-link"
+              [routerLink]="['/brand', product.brandSlug]"
+            >
+              {{ product.brand }}
+            </a>
+            <ng-template #plainBrand>
+              <div class="brand-pill">{{ product.brand }}</div>
+            </ng-template>
 
             <h1>{{ product.title }}</h1>
 
@@ -156,6 +166,12 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
     ion-img { height: 220px; object-fit: contain; }
     h1 { font-size: 1.2rem; margin: 0 0 6px; color:#173d52; }
     .brand { color:#6b8490; margin:0 0 12px; }
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      cursor: pointer;
+    }
     .badges, .quantity-box { display:flex; align-items:center; gap:10px; margin:14px 0; }
     h3 { margin: 16px 0 6px; color:#173d52; }
     .product-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }

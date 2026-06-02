@@ -45,6 +45,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/product-detail/product-detail.page').then((m) => m.ProductDetailPage),
   },
   {
+    path: 'brand/:slug',
+    loadComponent: () => import('./pages/brand-products/brand-products.page').then((m) => m.BrandProductsPage),
+  },
+  {
     path: 'checkout',
     loadComponent: () => import('./pages/checkout/checkout.page').then((m) => m.CheckoutPage),
   },
@@ -95,6 +99,10 @@ export const routes: Routes = [
       {
         path: 'categories',
         loadComponent: () => import('./pages/admin/categories/admin-categories.page').then((m) => m.AdminCategoriesPage),
+      },
+      {
+        path: 'brands',
+        loadComponent: () => import('./pages/admin/brands/admin-brands.page').then((m) => m.AdminBrandsPage),
       },
       {
         path: 'orders',
