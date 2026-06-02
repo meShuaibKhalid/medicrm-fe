@@ -5,18 +5,8 @@ import {
   IonButton,
   IonContent,
   IonInput,
-  IonItem,
-  IonLabel,
-  IonSelect,
-  IonSelectOption,
   IonToggle,
   IonSearchbar,
-  IonHeader,
-  IonToolbar,
-  IonButtons,
-  IonBackButton,
-  IonTitle,
-  IonIcon,
 } from '@ionic/angular/standalone';
 import { CategoryService } from '../../../core/services/category.service';
 import { AdminService } from '../../../core/services/admin.service';
@@ -31,18 +21,8 @@ import { Category } from '../../../shared/models/app.models';
     IonButton,
     IonContent,
     IonInput,
-    IonItem,
-    IonLabel,
-    IonSelect,
-    IonSelectOption,
     IonToggle,
     IonSearchbar,
-    IonHeader,
-    IonToolbar,
-    IonButtons,
-    IonBackButton,
-    IonTitle,
-    IonIcon,
   ],
   template: `
     <ion-content class="categories-content">
@@ -148,14 +128,48 @@ import { Category } from '../../../shared/models/app.models';
           <div class="grid2">
             <div class="field-group">
               <label class="field-label">Parent category</label>
-              <ion-select class="field-input" [(ngModel)]="form.parentId">
-                <ion-select-option [value]="null">None</ion-select-option>
-                <ion-select-option
-                  *ngFor="let cat of parentCategories"
-                  [value]="cat.id"
-                  >{{ cat.name }}</ion-select-option
-                >
-              </ion-select>
+              <div class="category-picker soft-card">
+                <div class="category-dropdown">
+                  <input
+                    type="text"
+                    [(ngModel)]="parentCategorySearch"
+                    [ngModelOptions]="{ standalone: true }"
+                    placeholder="Search parent categories"
+                    class="category-search-input"
+                    (focus)="openParentCategoryDropdown()"
+                    (input)="openParentCategoryDropdown()"
+                  />
+                  <button
+                    type="button"
+                    class="category-toggle-btn"
+                    (click)="toggleParentCategoryDropdown()"
+                    aria-label="Toggle parent category dropdown"
+                  >
+                    {{ isParentCategoryDropdownOpen ? '▲' : '▼' }}
+                  </button>
+                </div>
+                <div class="category-results" *ngIf="isParentCategoryDropdownOpen">
+                  <button
+                    type="button"
+                    class="category-option"
+                    [class.selected]="!form.parentId"
+                    (click)="selectParentCategory(null)"
+                  >
+                    None
+                  </button>
+                  <button
+                    *ngFor="let cat of filteredParentCategories"
+                    type="button"
+                    class="category-option"
+                    [class.selected]="form.parentId === cat.id"
+                    (click)="selectParentCategory(cat)"
+                  >
+                    {{ cat.name }}
+                  </button>
+                  <p class="category-empty" *ngIf="filteredParentCategories.length === 0">No parent categories found.</p>
+                </div>
+                <p class="selected-category" *ngIf="selectedParentCategoryLabel">Selected: {{ selectedParentCategoryLabel }}</p>
+              </div>
             </div>
             <div class="field-group">
               <label class="field-label">Status</label>
@@ -439,12 +453,19 @@ import { Category } from '../../../shared/models/app.models';
       }
       .modal-body {
         padding: 20px 22px;
+        overflow: visible;
       }
       .grid2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
         margin-bottom: 12px;
+        overflow: visible;
+      }
+      .field-group {
+        position: relative;
+        overflow: visible;
+        z-index: 1;
       }
       .field-label {
         font-size: 11px;
@@ -455,11 +476,11 @@ import { Category } from '../../../shared/models/app.models';
         display: block;
         margin-bottom: 5px;
       }
-      .field-input {
-        background: #ffffff;
-        border: 1.5px solid #fae8ef;
-        border-radius: 12px;
-        --padding-start: 14px;
+    .field-input {
+      background: #ffffff;
+      border: 1.5px solid #fae8ef;
+      border-radius: 12px;
+      --padding-start: 14px;
         color: #000000;
         font-size: 14px;
       }
@@ -486,6 +507,97 @@ import { Category } from '../../../shared/models/app.models';
         justify-content: flex-end;
         gap: 10px;
         margin-top: 18px;
+      }
+
+      .category-picker {
+        padding: 16px;
+        border-radius: 20px;
+        background: #fff;
+        position: relative;
+        z-index: 50;
+      }
+
+      .category-dropdown {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .category-search-input {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid #d8e4ea;
+        border-radius: 14px;
+        background: #f5f8fa;
+        color: #24404a;
+        font: inherit;
+        outline: none;
+        padding: 0 44px 0 14px;
+      }
+
+      .category-search-input:focus {
+        border-color: #0f8a6c;
+        background: #fff;
+      }
+
+      .category-toggle-btn {
+        position: absolute;
+        right: 10px;
+        border: 0;
+        background: transparent;
+        color: #55707a;
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 4px;
+      }
+
+      .category-results {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 240px;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #d8e4ea;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 16px 30px rgba(15, 34, 48, 0.14);
+        z-index: 20;
+      }
+
+      .category-option {
+        border: 1px solid #d8e4ea;
+        border-radius: 14px;
+        background: #f9fbfc;
+        color: #24404a;
+        cursor: pointer;
+        font: inherit;
+        padding: 10px 12px;
+        text-align: left;
+        transition: 0.2s ease;
+      }
+
+      .category-option.selected {
+        border-color: #0f8a6c;
+        background: #e8f7f1;
+        color: #0f6c56;
+      }
+
+      .selected-category {
+        margin: 10px 0 0;
+        color: #55707a;
+        font-size: 0.9rem;
+      }
+
+      .category-empty {
+        margin: 0;
+        color: #7b8d96;
+        font-size: 0.9rem;
+        padding: 10px 12px;
       }
     `,
   ],
@@ -572,7 +684,8 @@ export class AdminCategoriesPage {
   save(): void {
     if (!this.form.name || !this.form.slug) return;
 
-    const parent = this.categories.find((c) => c.id === this.form.parentId);
+    const parent = this.parentCategories.find((c) => c.id === this.form.parentId)
+      ?? this.categories.find((c) => c.id === this.form.parentId);
     this.form.level = parent ? parent.level + 1 : 0;
     this.form.parentId = this.form.parentId || null;
 
