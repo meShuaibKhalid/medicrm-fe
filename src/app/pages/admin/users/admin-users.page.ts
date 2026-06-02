@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonSearchbar } from '@ionic/angular/standalone';
+import { IonAlert, IonButton, IonContent, IonSearchbar } from '@ionic/angular/standalone';
 import { AdminService } from '../../../core/services/admin.service';
 import { User } from '../../../shared/models/app.models';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonButton, IonContent, IonSearchbar],
+  imports: [CommonModule, FormsModule, IonAlert, IonButton, IonContent, IonSearchbar],
   template: `
     <ion-content>
       <div class="page-shell">
@@ -58,9 +58,22 @@ import { User } from '../../../shared/models/app.models';
           <span>Page {{ page }} of {{ totalPages }} (Total: {{ totalItems }})</span>
           <ion-button size="small" fill="outline" [disabled]="page === totalPages" (click)="goToPage(page + 1)">Next</ion-button>
         </div>
+
+        <ion-alert
+          [isOpen]="isDeleteConfirmOpen"
+          header="Delete User"
+          message="Are you sure you want to delete this user?"
+          [buttons]="deleteConfirmButtons"
+          (didDismiss)="closeDeleteConfirm()"
+        ></ion-alert>
       </div>
     </ion-content>
   `,
+  styles: [`
+    .page-shell {
+      padding-top: 50px;
+    }
+  `],
 })
 export class AdminUsersPage {
   private readonly adminService = inject(AdminService);
@@ -70,6 +83,8 @@ export class AdminUsersPage {
   limit = 10;
   totalItems = 0;
   totalPages = 1;
+  isDeleteConfirmOpen = false;
+  private pendingDeleteUserId = '';
 
   constructor() {}
 
@@ -91,10 +106,34 @@ export class AdminUsersPage {
   }
 
   deleteUser(id: string): void {
-    if (confirm('Are you sure you want to delete this user?')) {
-      this.adminService.deleteUser(id).subscribe(() => {
-        this.load();
-      });
-    }
+    this.pendingDeleteUserId = id;
+    this.isDeleteConfirmOpen = true;
+  }
+
+  closeDeleteConfirm(): void {
+    this.isDeleteConfirmOpen = false;
+    this.pendingDeleteUserId = '';
+  }
+
+  get deleteConfirmButtons() {
+    return [
+      {
+        text: 'Cancel',
+        role: 'cancel' as const,
+        handler: () => this.closeDeleteConfirm(),
+      },
+      {
+        text: 'Delete',
+        role: 'destructive' as const,
+        handler: () => {
+          const id = this.pendingDeleteUserId;
+          this.closeDeleteConfirm();
+          if (!id) return;
+          this.adminService.deleteUser(id).subscribe(() => {
+            this.load();
+          });
+        },
+      },
+    ];
   }
 }

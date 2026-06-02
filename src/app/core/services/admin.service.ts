@@ -1,16 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { forkJoin, map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Category, Order, OrderStatus, Product, User } from '../../shared/models/app.models';
-import { ProductService } from './product.service';
-import { OrderService } from './order.service';
 import { environment } from '../../../environments/environment';
 import { ApiResponse, PaginatedResult } from './api.models';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  private readonly productService = inject(ProductService);
-  private readonly orderService = inject(OrderService);
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/admin`;
 
@@ -97,14 +93,15 @@ export class AdminService {
     );
   }
 
-  createProduct(product: Product): Observable<Product> {
+  createProduct(product: Product | FormData): Observable<Product> {
     return this.http.post<ApiResponse<any>>(`${this.baseUrl}/products`, product).pipe(
       map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
     );
   }
 
-  updateProduct(product: Product): Observable<Product> {
-    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/products/${product.id}`, product).pipe(
+  updateProduct(product: Product | FormData, productId?: string): Observable<Product> {
+    const id = productId ?? (product instanceof FormData ? '' : product.id);
+    return this.http.patch<ApiResponse<any>>(`${this.baseUrl}/products/${id}`, product).pipe(
       map((res) => ({ ...res.data, id: res.data._id || res.data.id }))
     );
   }

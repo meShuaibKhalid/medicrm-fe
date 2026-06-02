@@ -1,16 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import {
-  IonButton, IonContent, IonCheckbox, IonLabel
-} from '@ionic/angular/standalone';
+import { IonCheckbox, IonContent } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [FormsModule, RouterLink, IonButton, IonContent, IonCheckbox, IonLabel],
+  imports: [FormsModule, RouterLink, IonContent, IonCheckbox],
   styles: [`
     :host { --ion-background-color: var(--color-ice-blue); }
 

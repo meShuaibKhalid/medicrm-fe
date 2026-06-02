@@ -2,14 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IonButton, IonCheckbox, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonTextarea, IonTitle, IonToolbar, IonIcon } from '@ionic/angular/standalone';
+import { IonCheckbox, IonContent, IonHeader, IonTitle, IonToolbar, IonIcon } from '@ionic/angular/standalone';
 import { AddressService } from '../../core/services/address.service';
 import { Address } from '../../shared/models/app.models';
 
 @Component({
   selector: 'app-addresses',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonIcon, IonButton, IonCheckbox, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonTextarea, IonTitle, IonToolbar],
+  imports: [CommonModule, FormsModule, IonIcon, IonCheckbox, IonContent, IonHeader, IonTitle, IonToolbar],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar>

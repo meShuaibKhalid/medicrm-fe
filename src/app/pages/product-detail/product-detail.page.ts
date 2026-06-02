@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonBadge, IonButton, IonButtons, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonImg, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { ProductService } from '../../core/services/product.service';
@@ -23,7 +24,17 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
         <ion-title>Product Detail</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content *ngIf="product">
+    <ion-content>
+      <div class="page-shell state-card" *ngIf="loading">
+        Loading product...
+      </div>
+
+      <div class="page-shell state-card" *ngIf="!loading && loadError">
+        <p>{{ loadError }}</p>
+        <ion-button shape="round" (click)="router.navigateByUrl('/home')">Back to Home</ion-button>
+      </div>
+
+      <div *ngIf="product && !loading">
       <div class="page-shell">
         <ion-card class="soft-card">
           <div class="detail-image"><ion-img [src]="product.image" [alt]="product.title"></ion-img></div>
@@ -53,6 +64,7 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
           <app-product-card *ngFor="let item of relatedProducts" [product]="item" (addToCart)="addRelatedToCart($event)" (openProduct)="openRelated($event)"></app-product-card>
         </div>
       </div>
+      </div>
     </ion-content>
   `,
   styles: [`
@@ -63,6 +75,7 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
     .badges, .quantity-box { display:flex; align-items:center; gap:10px; margin:14px 0; }
     h3 { margin: 16px 0 6px; color:#173d52; }
     .product-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .state-card { padding-top: 24px; color: #64748b; }
   `],
 })
 export class ProductDetailPage {
@@ -75,15 +88,37 @@ export class ProductDetailPage {
   product?: Product;
   relatedProducts: Product[] = [];
   quantity = 1;
+  loading = true;
+  loadError = '';
 
   constructor() {
-    this.route.paramMap.subscribe((params) => {
-      const slug = params.get('slug') ?? '';
-      this.productService.getProductBySlug(slug).subscribe((product) => {
-        this.product = product;
-        this.productService.getFeaturedProducts().subscribe((products) => {
-          this.relatedProducts = products.filter((item) => item.slug !== slug).slice(0, 2);
-        });
+    const routedProduct = history.state?.product as Product | undefined;
+    if (routedProduct?.slug) {
+      this.product = routedProduct;
+      this.loading = false;
+    }
+
+    this.route.paramMap.pipe(
+      switchMap((params) => {
+        const slug = params.get('slug') ?? '';
+        this.quantity = 1;
+        this.loadError = '';
+        this.loading = !this.product || this.product.slug !== slug;
+        return this.productService.getProductBySlug(slug);
+      }),
+    ).subscribe((product) => {
+      if (!product) {
+        this.product = undefined;
+        this.relatedProducts = [];
+        this.loading = false;
+        this.loadError = 'Product not found or failed to load.';
+        return;
+      }
+
+      this.product = product;
+      this.loading = false;
+      this.productService.getFeaturedProducts().subscribe((products) => {
+        this.relatedProducts = products.filter((item) => item.slug !== product.slug).slice(0, 2);
       });
     });
   }
@@ -119,6 +154,6 @@ export class ProductDetailPage {
   }
 
   openRelated(product: Product): void {
-    this.router.navigate(['/products', product.slug]);
+    this.router.navigate(['/products', product.slug], { state: { product } });
   }
 }

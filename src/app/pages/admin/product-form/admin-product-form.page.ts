@@ -41,6 +41,11 @@ import { Category } from '../../../shared/models/app.models';
       </div>
     </ion-content>
   `,
+  styles: [`
+    .page-shell {
+      padding-top: 50px;
+    }
+  `],
 })
 export class AdminProductFormPage {
   private readonly fb = inject(FormBuilder);

@@ -1,13 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, IonBadge } from '@ionic/angular/standalone';
-import { HeaderComponent } from 'src/app/shared/components/header/header.component';
 import { CartService } from 'src/app/core/services/cart.service';
 
 @Component({
   selector: 'app-tabs',
   standalone: true,
-  imports: [CommonModule, IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, IonBadge, HeaderComponent],
+  imports: [CommonModule, IonIcon, IonLabel, IonRouterOutlet, IonTabBar, IonTabButton, IonTabs, IonBadge],
   template: `
     <ion-router-outlet></ion-router-outlet>
     <ion-tabs>

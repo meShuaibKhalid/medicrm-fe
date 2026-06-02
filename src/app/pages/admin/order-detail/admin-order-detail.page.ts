@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { IonButton, IonCard, IonCardContent, IonContent, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
+import { IonAlert, IonButton, IonCard, IonCardContent, IonContent, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { AdminService } from '../../../core/services/admin.service';
 import { Order } from '../../../shared/models/app.models';
 import { OrderStatusBadgeComponent } from '../../../shared/components/order-status-badge/order-status-badge.component';
@@ -9,7 +9,7 @@ import { OrderStatusBadgeComponent } from '../../../shared/components/order-stat
 @Component({
   selector: 'app-admin-order-detail',
   standalone: true,
-  imports: [CommonModule, IonButton, IonCard, IonCardContent, IonContent, IonItem, IonLabel, IonList, OrderStatusBadgeComponent],
+  imports: [CommonModule, IonAlert, IonButton, IonCard, IonCardContent, IonContent, IonItem, IonLabel, IonList, OrderStatusBadgeComponent],
   template: `
     <ion-content *ngIf="order">
       <div class="page-shell">
@@ -43,15 +43,35 @@ import { OrderStatusBadgeComponent } from '../../../shared/components/order-stat
           <ion-button expand="block" shape="round" color="success" [disabled]="!canComplete" (click)="updateStatus('Done')">Mark Done</ion-button>
           <ion-button expand="block" shape="round" color="danger" fill="outline" [disabled]="!canCancel" (click)="updateStatus('Cancelled')">Cancel Order</ion-button>
         </div>
+
+        <ion-alert
+          [isOpen]="isStatusConfirmOpen"
+          [header]="confirmHeader"
+          [message]="confirmMessage"
+          [buttons]="statusConfirmButtons"
+          (didDismiss)="closeStatusConfirm()"
+        ></ion-alert>
       </div>
     </ion-content>
   `,
-  styles: [`.actions { display:grid; gap:12px; margin-top:16px; }`],
+  styles: [`
+    .page-shell {
+      padding-top: 50px;
+    }
+
+    .actions {
+      display:grid;
+      gap:12px;
+      margin-top:16px;
+    }
+  `],
 })
 export class AdminOrderDetailPage {
   private readonly route = inject(ActivatedRoute);
   private readonly adminService = inject(AdminService);
   order?: Order;
+  isStatusConfirmOpen = false;
+  private pendingStatus?: Order['status'];
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
@@ -74,8 +94,44 @@ export class AdminOrderDetailPage {
     if (!this.order) {
       return;
     }
-    this.adminService.updateOrderStatus(this.order.id, status).subscribe((updated) => {
-      this.order = updated;
-    });
+    this.pendingStatus = status;
+    this.isStatusConfirmOpen = true;
+  }
+
+  get confirmHeader(): string {
+    return this.pendingStatus === 'Done' ? 'Complete Order' : 'Cancel Order';
+  }
+
+  get confirmMessage(): string {
+    return this.pendingStatus === 'Done'
+      ? 'Are you sure you want to mark this order as complete?'
+      : 'Are you sure you want to cancel this order?';
+  }
+
+  closeStatusConfirm(): void {
+    this.isStatusConfirmOpen = false;
+    this.pendingStatus = undefined;
+  }
+
+  get statusConfirmButtons() {
+    return [
+      {
+        text: 'Back',
+        role: 'cancel' as const,
+        handler: () => this.closeStatusConfirm(),
+      },
+      {
+        text: 'Confirm',
+        handler: () => {
+          const status = this.pendingStatus;
+          const orderId = this.order?.id;
+          this.closeStatusConfirm();
+          if (!status || !orderId) return;
+          this.adminService.updateOrderStatus(orderId, status).subscribe((updated) => {
+            this.order = updated;
+          });
+        },
+      },
+    ];
   }
 }

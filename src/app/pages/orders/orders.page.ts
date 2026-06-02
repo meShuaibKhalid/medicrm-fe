@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonButton, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { OrderService } from '../../core/services/order.service';
@@ -28,7 +28,7 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
     </ion-content>
   `,
 })
-export class OrdersPage {
+export class OrdersPage implements OnInit {
   private readonly orderService = inject(OrderService);
   orders$ = this.orderService.getMyOrders();
 

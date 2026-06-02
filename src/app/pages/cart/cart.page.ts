@@ -1,19 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IonButton, IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, IonImg, IonSearchbar, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { CartService } from '../../core/services/cart.service';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { PriceDisplayComponent } from '../../shared/components/price-display/price-display.component';
-import { CategoryCardComponent } from '../../shared/components/category-card/category-card.component';
-import { CategoryService } from 'src/app/core/services/category.service';
-import { Category, Product } from 'src/app/shared/models/app.models';
-import { ProductService } from 'src/app/core/services/product.service';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, EmptyStateComponent, PriceDisplayComponent,IonSearchbar, IonImg, IonIcon,CategoryCardComponent],
+  imports: [CommonModule, RouterLink, IonContent, EmptyStateComponent, PriceDisplayComponent, IonIcon],
   template: `
   <ion-content>
     <div class="page-shell cart-page">

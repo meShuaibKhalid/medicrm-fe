@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { IonApp, IonRouterOutlet, IonIcon } from '@ionic/angular/standalone';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { HeaderComponent } from './shared/components/header/header.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet, HeaderComponent, IonIcon],
+  imports: [IonApp, IonRouterOutlet, HeaderComponent],
 })
 export class AppComponent {}

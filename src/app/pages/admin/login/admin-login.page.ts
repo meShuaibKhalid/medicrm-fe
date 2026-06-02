@@ -18,6 +18,11 @@ import { AuthService } from '../../../core/services/auth.service';
       </div>
     </ion-content>
   `,
+  styles: [`
+    .page-shell {
+      padding-top: 50px;
+    }
+  `],
 })
 export class AdminLoginPage {
   private readonly authService = inject(AuthService);

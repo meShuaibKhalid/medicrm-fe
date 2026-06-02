@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { IonButton, IonCheckbox, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonSearchbar, IonSelect, IonSelectOption, IonToolbar, IonImg } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { combineLatest } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { CategoryService } from '../../core/services/category.service';
@@ -14,7 +14,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 @Component({
   selector: 'app-category-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, IonButton, IonCheckbox, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonSearchbar, IonSelect, IonSelectOption, IonToolbar, ProductCardComponent, IonImg],
+  imports: [CommonModule, FormsModule, RouterLink, IonButton, IonContent, IonIcon, ProductCardComponent],
   template: `
     <ion-content>
       <div class="page-shell listing-shell">
@@ -240,7 +240,7 @@ export class CategoryProductsPage {
   }
 
   openProduct(product: Product): void {
-    this.router.navigate(['/products', product.slug]);
+    this.router.navigate(['/products', product.slug], { state: { product } });
   }
 
   goToPage(page: number): void {

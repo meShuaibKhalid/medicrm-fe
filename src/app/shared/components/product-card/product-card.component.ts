@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { IonBadge, IonButton, IonCard, IonCardContent, IonIcon, IonImg } from '@ionic/angular/standalone';
+import { Component, EventEmitter, OnChanges, inject, Input, Output } from '@angular/core';
+import { IonBadge, IonCard, IonCardContent, IonIcon, IonImg } from '@ionic/angular/standalone';
 import { Product } from '../../models/app.models';
 import { PriceDisplayComponent } from '../price-display/price-display.component';
 import { WishlistService } from 'src/app/core/services/wishlist.service';
@@ -8,7 +8,7 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule, IonBadge, IonButton, IonCard, IonCardContent, IonIcon, IonImg, PriceDisplayComponent],
+  imports: [CommonModule, IonBadge, IonCard, IonCardContent, IonIcon, IonImg, PriceDisplayComponent],
   template: `
     <ion-card class="product-card soft-card">
       <button class="wishlist-btn" type="button" (click)="toggleWishlist($event)">
@@ -158,7 +158,7 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
     // }
   `],
 })
-export class ProductCardComponent {
+export class ProductCardComponent implements OnChanges {
   @Input({ required: true }) product!: Product;
   @Output() addToCart = new EventEmitter<Product>();
   @Output() openProduct = new EventEmitter<Product>();

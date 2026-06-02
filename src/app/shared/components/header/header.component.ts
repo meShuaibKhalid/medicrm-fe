@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { Router, NavigationEnd, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription, Observable, map } from 'rxjs';
 import { CategoryService } from '../../../core/services/category.service';
@@ -22,6 +22,7 @@ import { Category, Address } from '../../../shared/models/app.models';
 export class HeaderComponent implements OnInit, OnDestroy {
   showHeader = true;
   private routerSub!: Subscription;
+  private router = inject(Router);
   private categoryService = inject(CategoryService);
   private authService = inject(AuthService);
   private cartService = inject(CartService);
@@ -36,8 +37,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   defaultAddress$ = this.addressService.addresses$.pipe(
     map((addrs) => addrs.find((a) => a.isDefault) || addrs[0])
   );
-
-  constructor(private router: Router) {}
 
   ngOnInit() {
     this.checkRoute(this.router.url);

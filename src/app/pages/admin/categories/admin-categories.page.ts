@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonToggle, IonSearchbar } from '@ionic/angular/standalone';
+import { IonAlert, IonButton, IonContent, IonInput, IonItem, IonLabel, IonToggle, IonSearchbar } from '@ionic/angular/standalone';
 import { CategoryService } from '../../../core/services/category.service';
 import { AdminService } from '../../../core/services/admin.service';
 import { Category } from '../../../shared/models/app.models';
@@ -9,7 +9,7 @@ import { Category } from '../../../shared/models/app.models';
 @Component({ 
   selector: 'app-admin-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonButton, IonContent, IonInput, IonItem, IonLabel, IonSelect, IonSelectOption, IonToggle, IonSearchbar],
+  imports: [CommonModule, FormsModule, IonAlert, IonButton, IonContent, IonInput, IonItem, IonLabel, IonToggle, IonSearchbar],
   template: `
     <ion-content>
       <div class="page-shell">
@@ -26,7 +26,6 @@ import { Category } from '../../../shared/models/app.models';
               <tr>
                 <th>Name</th>
                 <th>Slug</th>
-                <th>Parent ID / Level</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -35,10 +34,6 @@ import { Category } from '../../../shared/models/app.models';
               <tr *ngFor="let category of categories">
                 <td><strong>{{ category.name }}</strong></td>
                 <td><code>{{ category.slug }}</code></td>
-                <td>
-                  <span class="badge">{{ category.parentId || 'Parent' }}</span>
-                  <span style="font-size: 0.8rem; color: #68818d; margin-left: 8px;">(Lvl {{ category.level }})</span>
-                </td>
                 <td>
                   <span [class]="category.isActive ? 'text-success' : 'text-danger'">
                     {{ category.isActive ? 'Active' : 'Inactive' }}
@@ -50,7 +45,7 @@ import { Category } from '../../../shared/models/app.models';
                 </td>
               </tr>
               <tr *ngIf="categories.length === 0">
-                <td colspan="5" style="text-align: center; color: #68818d;">No categories found.</td>
+                <td colspan="4" style="text-align: center; color: #68818d;">No categories found.</td>
               </tr>
             </tbody>
           </table>
@@ -82,13 +77,48 @@ import { Category } from '../../../shared/models/app.models';
               </div>
 
               <div class="modal-grid-2">
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Parent category</ion-label>
-                  <ion-select [(ngModel)]="form.parentId">
-                    <ion-select-option [value]="null">None</ion-select-option>
-                    <ion-select-option *ngFor="let cat of parentCategories" [value]="cat.id">{{ cat.name }}</ion-select-option>
-                  </ion-select>
-                </ion-item>
+                <div class="category-picker soft-card">
+                  <label class="field-label">Parent category</label>
+                  <div class="category-dropdown">
+                    <input
+                      type="text"
+                      [(ngModel)]="parentCategorySearch"
+                      placeholder="Search parent categories"
+                      class="category-search-input"
+                      (focus)="openParentCategoryDropdown()"
+                      (input)="openParentCategoryDropdown()"
+                    />
+                    <button
+                      type="button"
+                      class="category-toggle-btn"
+                      (click)="toggleParentCategoryDropdown()"
+                      aria-label="Toggle parent category dropdown"
+                    >
+                      {{ isParentCategoryDropdownOpen ? '▲' : '▼' }}
+                    </button>
+                  </div>
+                  <div class="category-results" *ngIf="isParentCategoryDropdownOpen">
+                    <button
+                      type="button"
+                      class="category-option"
+                      [class.selected]="!form.parentId"
+                      (click)="selectParentCategory(null)"
+                    >
+                      None
+                    </button>
+                    <button
+                      *ngFor="let cat of filteredParentCategories"
+                      type="button"
+                      class="category-option"
+                      [class.selected]="form.parentId === cat.id"
+                      (click)="selectParentCategory(cat)"
+                    >
+                      {{ cat.name }}
+                    </button>
+                    <p class="category-empty" *ngIf="filteredParentCategories.length === 0">No parent categories found.</p>
+                  </div>
+                  <p class="selected-category" *ngIf="selectedParentCategoryLabel">Selected: {{ selectedParentCategoryLabel }}</p>
+                </div>
                 <ion-item class="soft-card" style="align-items: center; display: flex; height: 100%;">
                   <ion-label>Active</ion-label>
                   <ion-toggle [(ngModel)]="form.isActive"></ion-toggle>
@@ -104,9 +134,115 @@ import { Category } from '../../../shared/models/app.models';
             </div>
           </div>
         </dialog>
+
+        <ion-alert
+          [isOpen]="isDeleteConfirmOpen"
+          header="Delete Category"
+          message="Are you sure you want to delete this category?"
+          [buttons]="deleteConfirmButtons"
+          (didDismiss)="closeDeleteConfirm()"
+        ></ion-alert>
       </div>
     </ion-content>
   `,
+  styles: [`
+    .page-shell {
+      padding-top: 50px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      color: #24404a;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .category-picker {
+      padding: 16px;
+      border-radius: 20px;
+      background: #fff;
+    }
+
+    .category-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .category-search-input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #d8e4ea;
+      border-radius: 14px;
+      background: #f5f8fa;
+      color: #24404a;
+      font: inherit;
+      outline: none;
+      padding: 0 44px 0 14px;
+    }
+
+    .category-search-input:focus {
+      border-color: #0f8a6c;
+      background: #fff;
+    }
+
+    .category-toggle-btn {
+      position: absolute;
+      right: 10px;
+      border: 0;
+      background: transparent;
+      color: #55707a;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 4px;
+    }
+
+    .category-results {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #d8e4ea;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .category-option {
+      border: 1px solid #d8e4ea;
+      border-radius: 14px;
+      background: #f9fbfc;
+      color: #24404a;
+      cursor: pointer;
+      font: inherit;
+      padding: 10px 12px;
+      text-align: left;
+      transition: 0.2s ease;
+    }
+
+    .category-option.selected {
+      border-color: #0f8a6c;
+      background: #e8f7f1;
+      color: #0f6c56;
+    }
+
+    .selected-category {
+      margin: 10px 0 0;
+      color: #55707a;
+      font-size: 0.9rem;
+    }
+
+    .category-empty {
+      margin: 0;
+      color: #7b8d96;
+      font-size: 0.9rem;
+      padding: 10px 12px;
+    }
+  `],
 })
 export class AdminCategoriesPage {
   private readonly categoryService = inject(CategoryService);
@@ -114,12 +250,16 @@ export class AdminCategoriesPage {
   categories: Category[] = [];
   parentCategories: Category[] = [];
   form: Partial<Category> = { isActive: true, level: 0, parentId: null };
+  parentCategorySearch = '';
+  isParentCategoryDropdownOpen = false;
 
   search = '';
   page = 1;
   limit = 10;
   totalItems = 0;
   totalPages = 1;
+  isDeleteConfirmOpen = false;
+  private pendingDeleteCategoryId = '';
 
   @ViewChild('categoryDialog') categoryDialog!: ElementRef<HTMLDialogElement>;
 
@@ -138,8 +278,22 @@ export class AdminCategoriesPage {
 
   loadParents(): void {
     this.categoryService.getCategories().subscribe((categories) => {
-      this.parentCategories = categories.filter((category) => category.level === 0 || !category.parentId);
+      this.parentCategories = categories
+        .filter((category) => category.level === 0 || !category.parentId)
+        .sort((a, b) => a.name.localeCompare(b.name));
     });
+  }
+
+  get filteredParentCategories(): Category[] {
+    const term = this.parentCategorySearch.trim().toLowerCase();
+    if (!term) return this.parentCategories;
+    return this.parentCategories.filter((category) => category.name.toLowerCase().includes(term));
+  }
+
+  get selectedParentCategoryLabel(): string {
+    if (!this.form.parentId) return 'None';
+    const category = this.parentCategories.find((item) => item.id === this.form.parentId);
+    return category ? category.name : 'None';
   }
 
   goToPage(p: number): void {
@@ -154,10 +308,12 @@ export class AdminCategoriesPage {
 
   edit(category: Category): void {
     this.form = { ...category };
+    this.populateParentCategorySearch();
     this.categoryDialog.nativeElement.showModal();
   }
 
   closeModal(): void {
+    this.isParentCategoryDropdownOpen = false;
     this.categoryDialog.nativeElement.close();
   }
 
@@ -186,15 +342,60 @@ export class AdminCategoriesPage {
   }
 
   deleteCategory(id: string): void {
-    if (confirm('Are you sure you want to delete this category?')) {
-      this.adminService.deleteCategory(id).subscribe(() => {
-        this.load();
-        this.loadParents();
-      });
-    }
+    this.pendingDeleteCategoryId = id;
+    this.isDeleteConfirmOpen = true;
   }
 
   resetForm(): void {
     this.form = { isActive: true, level: 0, parentId: null };
+    this.parentCategorySearch = '';
+    this.isParentCategoryDropdownOpen = false;
+  }
+
+  openParentCategoryDropdown(): void {
+    this.isParentCategoryDropdownOpen = true;
+  }
+
+  toggleParentCategoryDropdown(): void {
+    this.isParentCategoryDropdownOpen = !this.isParentCategoryDropdownOpen;
+  }
+
+  selectParentCategory(category: Category | null): void {
+    this.form.parentId = category?.id ?? null;
+    this.parentCategorySearch = category?.name ?? '';
+    this.isParentCategoryDropdownOpen = false;
+  }
+
+  private populateParentCategorySearch(): void {
+    const category = this.parentCategories.find((item) => item.id === this.form.parentId);
+    this.parentCategorySearch = category?.name ?? '';
+  }
+
+  closeDeleteConfirm(): void {
+    this.isDeleteConfirmOpen = false;
+    this.pendingDeleteCategoryId = '';
+  }
+
+  get deleteConfirmButtons() {
+    return [
+      {
+        text: 'Cancel',
+        role: 'cancel' as const,
+        handler: () => this.closeDeleteConfirm(),
+      },
+      {
+        text: 'Delete',
+        role: 'destructive' as const,
+        handler: () => {
+          const id = this.pendingDeleteCategoryId;
+          this.closeDeleteConfirm();
+          if (!id) return;
+          this.adminService.deleteCategory(id).subscribe(() => {
+            this.load();
+            this.loadParents();
+          });
+        },
+      },
+    ];
   }
 }

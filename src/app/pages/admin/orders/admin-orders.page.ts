@@ -69,6 +69,11 @@ import { OrderStatusBadgeComponent } from '../../../shared/components/order-stat
       </div>
     </ion-content>
   `,
+  styles: [`
+    .page-shell {
+      padding-top: 50px;
+    }
+  `],
 })
 export class AdminOrdersPage {
   private readonly adminService = inject(AdminService);

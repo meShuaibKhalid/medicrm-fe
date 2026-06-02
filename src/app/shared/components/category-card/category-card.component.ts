@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular/standalone';
 import { Category } from '../../models/app.models';
 
 @Component({
   selector: 'app-category-card',
   standalone: true,
-  imports: [RouterLink, IonButton, IonIcon],
+  imports: [RouterLink, IonIcon],
   template: `
     <button class="category-card" fill="clear" [routerLink]="['/categories', category.slug, 'products']">
       <span>{{ category.name }}</span>

@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, inject, ViewChild } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { IonButton, IonContent, IonInput, IonItem, IonLabel, IonSearchbar, IonSelect, IonSelectOption, IonTextarea, IonToggle } from '@ionic/angular/standalone';
-import { ProductService } from '../../../core/services/product.service';
+import { IonAlert, IonButton, IonContent, IonInput, IonItem, IonLabel, IonSearchbar, IonTextarea, IonToggle } from '@ionic/angular/standalone';
 import { AdminService } from '../../../core/services/admin.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { Product, Category } from '../../../shared/models/app.models';
@@ -15,15 +13,13 @@ import { Product, Category } from '../../../shared/models/app.models';
     CommonModule, 
     FormsModule, 
     ReactiveFormsModule, 
-    RouterLink, 
+    IonAlert,
     IonButton, 
     IonContent, 
     IonSearchbar, 
     IonInput, 
     IonItem, 
     IonLabel, 
-    IonSelect, 
-    IonSelectOption, 
     IonTextarea, 
     IonToggle
   ],
@@ -34,7 +30,7 @@ import { Product, Category } from '../../../shared/models/app.models';
           <h2>Products</h2>
           <ion-button size="small" (click)="openAddModal()">Add Product</ion-button>
         </div>
-        <ion-searchbar placeholder="Search products" [(ngModel)]="search" (ionInput)="page = 1; load()"></ion-searchbar>
+        <ion-searchbar placeholder="Search products" [(ngModel)]="search" (ionInput)="onSearchInput()"></ion-searchbar>
         
         <div class="admin-table-wrapper">
           <table class="admin-table">
@@ -105,12 +101,41 @@ import { Product, Category } from '../../../shared/models/app.models';
                   <ion-label position="stacked">Brand</ion-label>
                   <ion-input formControlName="brand" placeholder="Brand Name"></ion-input>
                 </ion-item>
-                <ion-item class="soft-card">
-                  <ion-label position="stacked">Category *</ion-label>
-                  <ion-select formControlName="primaryCategoryId">
-                    <ion-select-option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</ion-select-option>
-                  </ion-select>
-                </ion-item>
+                <div class="category-picker soft-card">
+                  <label class="field-label">Category *</label>
+                  <div class="category-dropdown">
+                    <input
+                      type="text"
+                      [(ngModel)]="categorySearch"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Search categories"
+                      class="category-search-input"
+                      (focus)="openCategoryDropdown()"
+                      (input)="openCategoryDropdown()"
+                    />
+                    <button
+                      type="button"
+                      class="category-toggle-btn"
+                      (click)="toggleCategoryDropdown()"
+                      aria-label="Toggle category dropdown"
+                    >
+                      {{ isCategoryDropdownOpen ? '▲' : '▼' }}
+                    </button>
+                  </div>
+                  <div class="category-results" *ngIf="isCategoryDropdownOpen">
+                    <button
+                      *ngFor="let category of filteredCategories"
+                      type="button"
+                      class="category-option"
+                      [class.selected]="form.value.primaryCategoryId === category.id"
+                      (click)="selectCategory(category)"
+                    >
+                      {{ category.name }}
+                    </button>
+                    <p class="category-empty" *ngIf="filteredCategories.length === 0">No categories found.</p>
+                  </div>
+                  <p class="selected-category" *ngIf="selectedCategoryLabel">Selected: {{ selectedCategoryLabel }}</p>
+                </div>
               </div>
 
               <div class="modal-grid-2">
@@ -146,10 +171,14 @@ import { Product, Category } from '../../../shared/models/app.models';
                 </ion-item>
               </div>
 
-              <ion-item class="soft-card">
-                <ion-label position="stacked">Image URL</ion-label>
-                <ion-input formControlName="image" placeholder="https://example.com/image.jpg"></ion-input>
-              </ion-item>
+              <div class="soft-card image-upload-card">
+                <label class="field-label">Product Image</label>
+                <input type="file" accept="image/*" (change)="onImageSelected($event)" />
+                <p class="selected-file" *ngIf="selectedImageName">{{ selectedImageName }}</p>
+                <div class="image-preview" *ngIf="imagePreviewUrl">
+                  <img [src]="imagePreviewUrl" [alt]="form.value.title || 'Product image preview'" />
+                </div>
+              </div>
 
               <ion-item class="soft-card">
                 <ion-label position="stacked">Description</ion-label>
@@ -176,24 +205,175 @@ import { Product, Category } from '../../../shared/models/app.models';
             </form>
           </div>
         </dialog>
+
+        <ion-alert
+          [isOpen]="isDeleteConfirmOpen"
+          header="Delete Product"
+          message="Are you sure you want to delete this product?"
+          [buttons]="deleteConfirmButtons"
+          (didDismiss)="closeDeleteConfirm()"
+        ></ion-alert>
       </div>
     </ion-content>
   `,
+  styles: [`
+    .page-shell {
+      padding-top: 50px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      color: #24404a;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .category-picker,
+    .image-upload-card {
+      padding: 16px;
+      border-radius: 20px;
+      background: #fff;
+    }
+
+    .category-search {
+      --background: #f5f8fa;
+      --box-shadow: none;
+      padding-inline: 0;
+    }
+
+    .category-picker {
+      position: relative;
+      z-index: 5;
+    }
+
+    .category-dropdown {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .category-search-input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #d8e4ea;
+      border-radius: 14px;
+      background: #f5f8fa;
+      color: #24404a;
+      font: inherit;
+      outline: none;
+      padding: 0 44px 0 14px;
+    }
+
+    .category-search-input:focus {
+      border-color: #0f8a6c;
+      background: #fff;
+    }
+
+    .category-toggle-btn {
+      position: absolute;
+      right: 10px;
+      border: 0;
+      background: transparent;
+      color: #55707a;
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 4px;
+    }
+
+    .category-results {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 10px;
+      border: 1px solid #d8e4ea;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 16px 30px rgba(15, 34, 48, 0.14);
+      z-index: 20;
+    }
+
+    .category-option {
+      border: 1px solid #d8e4ea;
+      border-radius: 14px;
+      background: #f9fbfc;
+      color: #24404a;
+      cursor: pointer;
+      font: inherit;
+      padding: 10px 12px;
+      text-align: left;
+      transition: 0.2s ease;
+    }
+
+    .category-option.selected {
+      border-color: #0f8a6c;
+      background: #e8f7f1;
+      color: #0f6c56;
+    }
+
+    .selected-category,
+    .selected-file {
+      margin: 10px 0 0;
+      color: #55707a;
+      font-size: 0.9rem;
+    }
+
+    .category-empty {
+      margin: 0;
+      color: #7b8d96;
+      font-size: 0.9rem;
+      padding: 10px 12px;
+    }
+
+    .image-upload-card input[type="file"] {
+      display: block;
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    .image-preview {
+      margin-top: 12px;
+    }
+
+    .image-preview img {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      border-radius: 16px;
+      background: #f6f8fa;
+      border: 1px solid #d8e4ea;
+      padding: 10px;
+    }
+  `],
 })
-export class AdminProductsPage {
-  private readonly productService = inject(ProductService);
+export class AdminProductsPage implements OnDestroy {
   private readonly adminService = inject(AdminService);
   private readonly categoryService = inject(CategoryService);
   private readonly fb = inject(FormBuilder);
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   search = '';
   products: Product[] = [];
   categories: Category[] = [];
+  categorySearch = '';
+  isCategoryDropdownOpen = false;
+  imagePreviewUrl = '';
+  selectedImageName = '';
+  private selectedImageFile: File | null = null;
+  private imageObjectUrl: string | null = null;
 
   page = 1;
   limit = 10;
   totalItems = 0;
   totalPages = 1;
+  isDeleteConfirmOpen = false;
+  private pendingDeleteProductId = '';
 
   form = this.fb.group({
     id: [''],
@@ -218,8 +398,40 @@ export class AdminProductsPage {
   constructor() {
     this.load();
     this.categoryService.getCategories().subscribe((categories) => {
-      this.categories = categories.filter((category) => category.level === 0 || !category.parentId);
+      this.categories = categories
+        .sort((a, b) => a.name.localeCompare(b.name));
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
+    this.revokeImageObjectUrl();
+  }
+
+  get filteredCategories(): Category[] {
+    const term = this.categorySearch.trim().toLowerCase();
+    if (!term) return this.categories;
+    return this.categories.filter((category) => category.name.toLowerCase().includes(term));
+  }
+
+  get selectedCategoryLabel(): string {
+    const selectedId = this.form.value.primaryCategoryId;
+    if (!selectedId) return '';
+    const category = this.categories.find((item) => item.id === selectedId);
+    return category ? category.name : '';
+  }
+
+  onSearchInput(): void {
+    this.page = 1;
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+    this.searchDebounceTimer = setTimeout(() => {
+      this.load();
+    }, 250);
   }
 
   load(): void {
@@ -237,7 +449,10 @@ export class AdminProductsPage {
 
   openAddModal(): void {
     this.resetForm();
-    this.productDialog.nativeElement.showModal();
+    const dialog = this.productDialog?.nativeElement;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
   }
 
   edit(product: Product): void {
@@ -258,11 +473,22 @@ export class AdminProductsPage {
       prescriptionRequired: product.prescriptionRequired,
       isActive: product.isActive,
     });
-    this.productDialog.nativeElement.showModal();
+    this.selectedImageFile = null;
+    this.selectedImageName = '';
+    this.setImagePreview(product.image || '');
+    this.populateCategorySearch(product.primaryCategoryId || '');
+    const dialog = this.productDialog?.nativeElement;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
   }
 
   closeModal(): void {
-    this.productDialog.nativeElement.close();
+    this.isCategoryDropdownOpen = false;
+    const dialog = this.productDialog?.nativeElement;
+    if (dialog?.open) {
+      dialog.close();
+    }
   }
 
   save(): void {
@@ -271,26 +497,10 @@ export class AdminProductsPage {
       return;
     }
     const value = this.form.getRawValue();
-    const payload: Product = {
-      id: value.id || `prd-${Date.now()}`,
-      title: value.title || '',
-      slug: value.slug || '',
-      brand: value.brand || '',
-      description: value.description || '',
-      image: value.image || '',
-      price: Number(value.price || 0),
-      salePrice: Number(value.salePrice || value.price || 0),
-      salePercent: Number(value.salePercent || 0),
-      stock: Number(value.stock || 0),
-      maxOrder: Number(value.maxOrder || 10),
-      primaryCategoryId: value.primaryCategoryId || '',
-      categoryIds: [value.primaryCategoryId || ''],
-      usedFor: value.usedFor || '',
-      prescriptionRequired: Boolean(value.prescriptionRequired),
-      isActive: Boolean(value.isActive),
-    };
-
-    const request = value.id ? this.adminService.updateProduct(payload) : this.adminService.createProduct(payload);
+    const payload = this.buildProductFormData();
+    const request = value.id
+      ? this.adminService.updateProduct(payload, value.id || '')
+      : this.adminService.createProduct(payload);
     request.subscribe(() => {
       this.load();
       this.closeModal();
@@ -299,11 +509,8 @@ export class AdminProductsPage {
   }
 
   deleteProduct(id: string): void {
-    if (confirm('Are you sure you want to delete this product?')) {
-      this.adminService.deleteProduct(id).subscribe(() => {
-        this.load();
-      });
-    }
+    this.pendingDeleteProductId = id;
+    this.isDeleteConfirmOpen = true;
   }
 
   resetForm(): void {
@@ -324,5 +531,106 @@ export class AdminProductsPage {
       prescriptionRequired: false,
       isActive: true,
     });
+    this.selectedImageFile = null;
+    this.selectedImageName = '';
+    this.categorySearch = '';
+    this.isCategoryDropdownOpen = false;
+    this.setImagePreview('');
+  }
+
+  selectCategory(category: Category): void {
+    this.form.patchValue({ primaryCategoryId: category.id });
+    this.categorySearch = category.name;
+    this.isCategoryDropdownOpen = false;
+  }
+
+  openCategoryDropdown(): void {
+    this.isCategoryDropdownOpen = true;
+  }
+
+  toggleCategoryDropdown(): void {
+    this.isCategoryDropdownOpen = !this.isCategoryDropdownOpen;
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.selectedImageFile = file;
+    this.selectedImageName = file?.name || '';
+    this.setImagePreview(file ? URL.createObjectURL(file) : this.form.value.image || '');
+    input.value = '';
+  }
+
+  private populateCategorySearch(categoryId: string): void {
+    const category = this.categories.find((item) => item.id === categoryId);
+    this.categorySearch = category ? category.name : '';
+  }
+
+  private buildProductFormData(): FormData {
+    const value = this.form.getRawValue();
+    const formData = new FormData();
+    formData.append('title', value.title || '');
+    formData.append('slug', value.slug || '');
+    formData.append('brand', value.brand || '');
+    formData.append('description', value.description || '');
+    formData.append('image', value.image || '');
+    formData.append('price', String(Number(value.price || 0)));
+    formData.append('salePrice', String(Number(value.salePrice || value.price || 0)));
+    formData.append('salePercent', String(Number(value.salePercent || 0)));
+    formData.append('stock', String(Number(value.stock || 0)));
+    formData.append('maxOrder', String(Number(value.maxOrder || 10)));
+    formData.append('primaryCategoryId', value.primaryCategoryId || '');
+    formData.append('categoryIds', JSON.stringify([value.primaryCategoryId || '']));
+    formData.append('usedFor', value.usedFor || '');
+    formData.append('prescriptionRequired', String(Boolean(value.prescriptionRequired)));
+    formData.append('isActive', String(Boolean(value.isActive)));
+
+    if (this.selectedImageFile) {
+      formData.append('imageFile', this.selectedImageFile);
+    }
+
+    return formData;
+  }
+
+  private setImagePreview(url: string): void {
+    this.revokeImageObjectUrl();
+    this.imagePreviewUrl = url;
+    if (url.startsWith('blob:')) {
+      this.imageObjectUrl = url;
+    }
+  }
+
+  private revokeImageObjectUrl(): void {
+    if (this.imageObjectUrl) {
+      URL.revokeObjectURL(this.imageObjectUrl);
+      this.imageObjectUrl = null;
+    }
+  }
+
+  closeDeleteConfirm(): void {
+    this.isDeleteConfirmOpen = false;
+    this.pendingDeleteProductId = '';
+  }
+
+  get deleteConfirmButtons() {
+    return [
+      {
+        text: 'Cancel',
+        role: 'cancel' as const,
+        handler: () => this.closeDeleteConfirm(),
+      },
+      {
+        text: 'Delete',
+        role: 'destructive' as const,
+        handler: () => {
+          const id = this.pendingDeleteProductId;
+          this.closeDeleteConfirm();
+          if (!id) return;
+          this.adminService.deleteProduct(id).subscribe(() => {
+            this.load();
+          });
+        },
+      },
+    ];
   }
 }

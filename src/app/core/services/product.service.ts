@@ -131,7 +131,10 @@ export class ProductService {
   getProductBySlug(slug: string): Observable<Product | undefined> {
     return this.http
       .get<ApiResponse<any>>(`${this.baseUrl}/${slug}`)
-      .pipe(map((response) => this.mapProduct(response.data)));
+      .pipe(
+        map((response) => this.mapProduct(response.data)),
+        catchError(() => of(undefined)),
+      );
   }
 
   getFeaturedProducts(): Observable<Product[]> {

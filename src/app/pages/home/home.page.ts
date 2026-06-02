@@ -1,19 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { IonBadge, IonButton, IonCard, IonImg, IonCardContent, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonSearchbar, IonToolbar, IonFooter } from '@ionic/angular/standalone';
+import { IonBadge, IonButton, IonCard, IonCardContent, IonContent, IonIcon, IonItem, IonLabel, IonList } from '@ionic/angular/standalone';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { CategoryService } from '../../core/services/category.service';
 import { ProductService } from '../../core/services/product.service';
 import { Category, Product } from '../../shared/models/app.models';
-import { CategoryCardComponent } from '../../shared/components/category-card/category-card.component';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, IonBadge, IonImg, IonButton, IonCard, IonCardContent, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonSearchbar, IonToolbar, CategoryCardComponent, ProductCardComponent, IonFooter],
+  imports: [CommonModule, RouterLink, IonBadge, IonButton, IonCard, IonCardContent, IonContent, IonIcon, IonItem, IonLabel, IonList, ProductCardComponent],
   template: `
     <ion-content>
       <div class="page-shell homepage-shell">
@@ -298,7 +297,7 @@ export class HomePage {
   }
 
   openProduct(product: Product): void {
-    this.router.navigate(['/products', product.slug]);
+    this.router.navigate(['/products', product.slug], { state: { product } });
   }
 
   private loadHomeProducts(): void {
