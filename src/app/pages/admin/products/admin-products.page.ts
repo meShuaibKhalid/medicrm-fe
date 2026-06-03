@@ -21,8 +21,6 @@ import {
   IonItem,
   IonLabel,
   IonSearchbar,
-  IonSelect,
-  IonSelectOption,
   IonTextarea,
   IonToggle,
   IonModal,
@@ -49,8 +47,6 @@ import { IonAlert } from '@ionic/angular/standalone';
     IonInput,
     IonItem,
     IonLabel,
-    IonSelect,
-    IonSelectOption,
     IonTextarea,
     IonToggle,
     IonIcon,
@@ -183,39 +179,76 @@ import { IonAlert } from '@ionic/angular/standalone';
                 </div>
 
                 <div class="modal-grid-2">
-                  <div class="field-group">
+                  <div class="field-group searchable-field">
                     <label class="field-label">Brand</label>
-                    <ion-select
-                      class="field-input"
-                      formControlName="brandId"
-                      interface="popover"
-                      placeholder="Select brand"
+                    <ion-input
+                      class="field-input category-search-input"
+                      [value]="brandSearch"
+                      placeholder="Search brand"
+                      (ionInput)="onBrandSearch($event)"
+                      (ionFocus)="openBrandDropdown()"
+                    ></ion-input>
+                    <button
+                      type="button"
+                      class="category-toggle-btn"
+                      (click)="toggleBrandDropdown()"
                     >
-                      <ion-select-option value="">No Brand</ion-select-option>
-                      <ion-select-option
-                        *ngFor="let brand of brands"
-                        [value]="brand.id"
-                        >{{ brand.name }}</ion-select-option
+                      ▾
+                    </button>
+                    <div class="category-results" *ngIf="isBrandDropdownOpen">
+                      <button
+                        type="button"
+                        class="category-option"
+                        [class.selected]="!form.value.brandId"
+                        (click)="selectBrand(null)"
                       >
-                    </ion-select>
+                        No Brand
+                      </button>
+                      <button
+                        type="button"
+                        class="category-option"
+                        *ngFor="let brand of filteredBrands"
+                        [class.selected]="form.value.brandId === brand.id"
+                        (click)="selectBrand(brand)"
+                      >
+                        {{ brand.name }}
+                      </button>
+                      <p class="category-empty" *ngIf="filteredBrands.length === 0">
+                        No matching brands.
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div class="field-group">
+
+                  <div class="field-group searchable-field">
                     <label class="field-label">Category *</label>
-                    <ion-select
-                      class="field-input"
-                      placeholder="Select category"
-                      interface="popover"
-                      [value]="form.value.primaryCategoryId"
-                      (ionChange)="selectCategory($event.detail.value)"
+                    <ion-input
+                      class="field-input category-search-input"
+                      [value]="categorySearch"
+                      placeholder="Search category"
+                      (ionInput)="onCategorySearch($event)"
+                      (ionFocus)="openCategoryDropdown()"
+                    ></ion-input>
+                    <button
+                      type="button"
+                      class="category-toggle-btn"
+                      (click)="toggleCategoryDropdown()"
                     >
-                      <ion-select-option
-                        *ngFor="let category of categories"
-                        [value]="category.id"
+                      ▾
+                    </button>
+                    <div class="category-results" *ngIf="isCategoryDropdownOpen">
+                      <button
+                        type="button"
+                        class="category-option"
+                        *ngFor="let category of filteredCategories"
+                        [class.selected]="form.value.primaryCategoryId === category.id"
+                        (click)="selectCategory(category.id)"
                       >
                         {{ category.name }}
-                      </ion-select-option>
-                    </ion-select>
+                      </button>
+                      <p class="category-empty" *ngIf="filteredCategories.length === 0">
+                        No matching categories.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -569,6 +602,10 @@ import { IonAlert } from '@ionic/angular/standalone';
         overflow: visible;
         z-index: 1;
       }
+
+      .searchable-field {
+        z-index: 30;
+      }
       .field-label {
         font-size: 11px;
         font-weight: 700;
@@ -678,13 +715,14 @@ import { IonAlert } from '@ionic/angular/standalone';
       .category-toggle-btn {
         position: absolute;
         right: 10px;
-        top: 10px;
-        border: 0;
-        background: transparent;
+        top: 40%;
+        border-radius: 8px;
+        background: white;
         color: #55707a;
         cursor: pointer;
         font-size: 0.9rem;
-        padding: 4px;
+        padding: 10px;
+        z-index: 50;
       }
 
       .category-results {
@@ -702,7 +740,7 @@ import { IonAlert } from '@ionic/angular/standalone';
         border-radius: 16px;
         background: #fff;
         box-shadow: 0 16px 30px rgba(15, 34, 48, 0.14);
-        z-index: 20;
+        z-index: 50;
       }
 
       .category-option {
@@ -774,7 +812,9 @@ export class AdminProductsPage implements OnDestroy {
   categories: Category[] = [];
   brands: Brand[] = [];
   categorySearch = '';
+  brandSearch = '';
   isCategoryDropdownOpen = false;
+  isBrandDropdownOpen = false;
   imagePreviewUrl = '';
   selectedImageName = '';
   private selectedImageFile: File | null = null;
@@ -833,6 +873,14 @@ export class AdminProductsPage implements OnDestroy {
     if (!term) return this.categories;
     return this.categories.filter((category) =>
       category.name.toLowerCase().includes(term),
+    );
+  }
+
+  get filteredBrands(): Brand[] {
+    const term = this.brandSearch.trim().toLowerCase();
+    if (!term) return this.brands;
+    return this.brands.filter((brand) =>
+      brand.name.toLowerCase().includes(term),
     );
   }
 
@@ -906,6 +954,7 @@ export class AdminProductsPage implements OnDestroy {
     this.selectedImageName = '';
     this.setImagePreview(product.image || '');
     this.populateCategorySearch(product.primaryCategoryId || '');
+    this.populateBrandSearch(product.brandId || '');
     const dialog = this.productDialog?.nativeElement;
     if (dialog && !dialog.open) {
       dialog.showModal();
@@ -915,6 +964,7 @@ export class AdminProductsPage implements OnDestroy {
 
   closeModal(): void {
     this.isCategoryDropdownOpen = false;
+    this.isBrandDropdownOpen = false;
     // const dialog = this.productDialog?.nativeElement;
     // if (dialog?.open) {
     //   dialog.close();
@@ -968,20 +1018,39 @@ export class AdminProductsPage implements OnDestroy {
     this.selectedImageFile = null;
     this.selectedImageName = '';
     this.categorySearch = '';
+    this.brandSearch = '';
     this.isCategoryDropdownOpen = false;
+    this.isBrandDropdownOpen = false;
     this.setImagePreview('');
   }
 
-  // selectCategory(category: Category): void {
-  //   this.form.patchValue({ primaryCategoryId: category.id });
-  //   this.categorySearch = category.name;
-  //   this.isCategoryDropdownOpen = false;
-  //   this.form.patchValue({ primaryCategoryId: category.id });
-  // // this.selectedCategoryLabel = category.name;
-  // }
-  selectCategory(id: number): void {
+  selectCategory(id: any): void {
+    const category = this.categories.find((item) => item.id === String(id));
     this.form.patchValue({ primaryCategoryId: String(id) });
+    this.categorySearch = category?.name || '';
+    this.isCategoryDropdownOpen = false;
   }
+
+  selectBrand(brand: Brand | null): void {
+    this.form.patchValue({ brandId: brand?.id || '' });
+    this.brandSearch = brand?.name || '';
+    this.isBrandDropdownOpen = false;
+  }
+
+  onBrandSearch(event: Event): void {
+    const value = (event.target as HTMLInputElement)?.value || '';
+    this.brandSearch = value;
+    if (!value) this.form.patchValue({ brandId: '' });
+    this.isBrandDropdownOpen = true;
+  }
+
+  onCategorySearch(event: Event): void {
+    const value = (event.target as HTMLInputElement)?.value || '';
+    this.categorySearch = value;
+    if (!value) this.form.patchValue({ primaryCategoryId: '' });
+    this.isCategoryDropdownOpen = true;
+  }
+
   openCategoryDropdown(): void {
     this.isCategoryDropdownOpen = true;
   }
@@ -990,14 +1059,29 @@ export class AdminProductsPage implements OnDestroy {
     this.isCategoryDropdownOpen = !this.isCategoryDropdownOpen;
   }
 
-  onImageSelected(event: Event): void {
+  openBrandDropdown(): void {
+    this.isBrandDropdownOpen = true;
+  }
+
+  toggleBrandDropdown(): void {
+    this.isBrandDropdownOpen = !this.isBrandDropdownOpen;
+  }
+
+  async onImageSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
-    this.selectedImageFile = file;
-    this.selectedImageName = file?.name || '';
-    this.setImagePreview(
-      file ? URL.createObjectURL(file) : this.form.value.image || '',
-    );
+    if (!file) {
+      this.selectedImageFile = null;
+      this.selectedImageName = '';
+      this.setImagePreview(this.form.value.image || '');
+      input.value = '';
+      return;
+    }
+
+    const compressed = await this.compressImage(file);
+    this.selectedImageFile = compressed;
+    this.selectedImageName = `${file.name} (${Math.round(compressed.size / 1024)} KB)`;
+    this.setImagePreview(URL.createObjectURL(compressed));
     input.value = '';
   }
 
@@ -1032,6 +1116,11 @@ export class AdminProductsPage implements OnDestroy {
   private populateCategorySearch(categoryId: string): void {
     const category = this.categories.find((item) => item.id === categoryId);
     this.categorySearch = category ? category.name : '';
+  }
+
+  private populateBrandSearch(brandId: string): void {
+    const brand = this.brands.find((item) => item.id === brandId);
+    this.brandSearch = brand ? brand.name : '';
   }
 
   private buildProductFormData(): FormData {
@@ -1077,6 +1166,39 @@ export class AdminProductsPage implements OnDestroy {
     if (url.startsWith('blob:')) {
       this.imageObjectUrl = url;
     }
+  }
+
+  private async compressImage(file: File): Promise<File> {
+    if (!file.type.startsWith('image/')) return file;
+
+    const bitmap = await createImageBitmap(file);
+    const maxSize = 1600;
+    const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+    const targetWidth = Math.max(1, Math.round(bitmap.width * scale));
+    const targetHeight = Math.max(1, Math.round(bitmap.height * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    const context = canvas.getContext('2d');
+    if (!context) {
+      bitmap.close?.();
+      return file;
+    }
+
+    context.drawImage(bitmap, 0, 0, targetWidth, targetHeight);
+    bitmap.close?.();
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((result) => resolve(result), 'image/webp', 0.82);
+    });
+
+    if (!blob) return file;
+
+    const baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+    const extension = blob.type === 'image/webp' ? 'webp' : 'jpg';
+    return new File([blob], `${baseName}.${extension}`, { type: blob.type });
   }
 
   private revokeImageObjectUrl(): void {

@@ -9,6 +9,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import {
   IonButton,
+  IonAlert,
   IonContent,
   IonInput,
   IonItem,
@@ -28,6 +29,7 @@ import { toSlug } from '../../../shared/utils/slug';
     CommonModule,
     FormsModule,
     IonButton,
+    IonAlert,
     IonContent,
     IonInput,
     IonItem,
@@ -178,6 +180,13 @@ import { toSlug } from '../../../shared/utils/slug';
           </ng-template>
         </ion-modal>
         <!-- </dialog> -->
+        <ion-alert
+          [isOpen]="isDeleteConfirmOpen"
+          header="Delete Brand"
+          message="Are you sure you want to delete this brand?"
+          [buttons]="deleteConfirmButtons"
+          (didDismiss)="closeDeleteConfirm()"
+        ></ion-alert>
       </div>
     </ion-content>
   `,
@@ -273,6 +282,8 @@ export class AdminBrandsPage implements OnDestroy {
   limit = 10;
   totalItems = 0;
   totalPages = 1;
+  isDeleteConfirmOpen = false;
+  private pendingDeleteBrandId = '';
   private autoSlugValue = '';
   private slugManuallyEdited = false;
   form: Partial<Brand> = {
@@ -396,7 +407,33 @@ export class AdminBrandsPage implements OnDestroy {
   }
 
   deleteBrand(id: string): void {
-    this.adminService.deleteBrand(id).subscribe(() => this.load());
+    this.pendingDeleteBrandId = id;
+    this.isDeleteConfirmOpen = true;
+  }
+
+  closeDeleteConfirm(): void {
+    this.isDeleteConfirmOpen = false;
+    this.pendingDeleteBrandId = '';
+  }
+
+  get deleteConfirmButtons() {
+    return [
+      {
+        text: 'Cancel',
+        role: 'cancel' as const,
+        handler: () => this.closeDeleteConfirm(),
+      },
+      {
+        text: 'Delete',
+        role: 'destructive' as const,
+        handler: () => {
+          const id = this.pendingDeleteBrandId;
+          this.closeDeleteConfirm();
+          if (!id) return;
+          this.adminService.deleteBrand(id).subscribe(() => this.load());
+        },
+      },
+    ];
   }
 
   private resetForm(): void {
