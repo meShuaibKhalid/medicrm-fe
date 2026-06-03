@@ -58,8 +58,8 @@ export class AddressService {
       area: addr.area,
       addressLine: addr.addressLine,
       nearestLandmark: addr.nearestLandmark || '',
-      latitude: addr.latitude || 0,
-      longitude: addr.longitude || 0,
+      latitude: addr.latitude ?? null,
+      longitude: addr.longitude ?? null,
       isDefault: addr.isDefault || false,
     };
   }
@@ -76,8 +76,8 @@ export class AddressService {
   addAddress(address: Omit<Address, 'id'>) {
     const payload = {
       ...address,
-      latitude: address.latitude || 0,
-      longitude: address.longitude || 0,
+      latitude: address.latitude ?? null,
+      longitude: address.longitude ?? null,
     };
     return this.http.post<AddressResponse>(this.apiUrl, payload).pipe(
       tap(() => this.loadAddresses())
@@ -87,8 +87,8 @@ export class AddressService {
   updateAddress(updated: Address) {
     const payload = {
       ...updated,
-      latitude: updated.latitude || 0,
-      longitude: updated.longitude || 0,
+      latitude: updated.latitude ?? null,
+      longitude: updated.longitude ?? null,
     };
     return this.http.patch<AddressResponse>(`${this.apiUrl}/${updated.id}`, payload).pipe(
       tap(() => this.loadAddresses())
@@ -111,4 +111,3 @@ export class AddressService {
     return this.addressesSubject.value.find((address) => address.isDefault);
   }
 }
-

@@ -10,7 +10,9 @@ import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { AddressService } from '../../../core/services/address.service';
-import { Category, Address } from '../../../shared/models/app.models';
+import { Brand, Category, Address, Product } from '../../../shared/models/app.models';
+import { ProductService } from '../../../core/services/product.service';
+import { BrandService } from '../../../core/services/brand.service';
 
 @Component({
   selector: 'app-header',
@@ -22,18 +24,26 @@ import { Category, Address } from '../../../shared/models/app.models';
 export class HeaderComponent implements OnInit, OnDestroy {
   showHeader = true;
   private routerSub!: Subscription;
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private router = inject(Router);
   private categoryService = inject(CategoryService);
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   private wishlistService = inject(WishlistService);
   private addressService = inject(AddressService);
+  private productService = inject(ProductService);
+  private brandService = inject(BrandService);
   
   categories$ = this.categoryService.getCategoryTree();
   currentUser$ = this.authService.currentUser$;
   cart$ = this.cartService.cart$;
   wishlist$ = this.wishlistService.wishlist$;
   addresses$ = this.addressService.addresses$;
+  searchTerm = '';
+  searchOpen = false;
+  isSearching = false;
+  searchProducts: Product[] = [];
+  searchBrands: Brand[] = [];
   defaultAddress$ = this.addressService.addresses$.pipe(
     map((addrs) => addrs.find((a) => a.isDefault) || addrs[0])
   );
@@ -51,6 +61,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.routerSub) {
       this.routerSub.unsubscribe();
+    }
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
     }
   }
 
@@ -116,5 +130,78 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (!this.isLoggedIn()) {
       this.router.navigateByUrl('/login');
     }
+  }
+
+  onSearchInput(value: string): void {
+    this.searchTerm = value;
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
+
+    if (!value.trim()) {
+      this.searchProducts = [];
+      this.searchBrands = [];
+      this.searchOpen = false;
+      return;
+    }
+
+    this.searchOpen = true;
+    this.isSearching = true;
+    this.searchDebounceTimer = setTimeout(() => {
+      this.loadSearchResults(value.trim());
+    }, 250);
+  }
+
+  closeSearch(): void {
+    this.searchOpen = false;
+  }
+
+  goToProduct(product: Product): void {
+    this.searchOpen = false;
+    this.searchTerm = '';
+    this.router.navigate(['/products', product.slug]);
+  }
+
+  goToBrand(brand: Brand): void {
+    this.searchOpen = false;
+    this.searchTerm = '';
+    this.router.navigate(['/brands', brand.slug]);
+  }
+
+  private loadSearchResults(term: string): void {
+    this.productService.searchProducts({ search: term, limit: 6, sort: 'latest' }).subscribe({
+      next: (products) => {
+        this.searchProducts = products.slice(0, 6);
+        this.brandService.getBrands().subscribe({
+          next: (brands) => {
+            this.searchBrands = brands.filter((brand) =>
+              brand.name.toLowerCase().includes(term.toLowerCase()),
+            ).slice(0, 6);
+            this.isSearching = false;
+            this.searchOpen = true;
+          },
+          error: () => {
+            this.searchBrands = [];
+            this.isSearching = false;
+          },
+        });
+      },
+      error: () => {
+        this.searchProducts = [];
+        this.brandService.getBrands().subscribe({
+          next: (brands) => {
+            this.searchBrands = brands.filter((brand) =>
+              brand.name.toLowerCase().includes(term.toLowerCase()),
+            ).slice(0, 6);
+            this.isSearching = false;
+            this.searchOpen = true;
+          },
+          error: () => {
+            this.searchBrands = [];
+            this.isSearching = false;
+          },
+        });
+      },
+    });
   }
 }

@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonButton,
+  IonButtons,
+  IonBackButton,
   IonCheckbox,
   IonContent,
   IonHeader,
@@ -27,6 +29,8 @@ import { Address } from '../../shared/models/app.models';
     FormsModule,
     IonIcon,
     IonButton,
+    IonButtons,
+    IonBackButton,
     IonCheckbox,
     IonContent,
     IonHeader,
@@ -41,6 +45,9 @@ import { Address } from '../../shared/models/app.models';
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/profile"></ion-back-button>
+        </ion-buttons>
         <ion-title class="header-title">Addresses</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -475,10 +482,20 @@ export class AddressesPage {
     if (!navigator.geolocation) {
       return;
     }
-    navigator.geolocation.getCurrentPosition((position) => {
-      this.form.latitude = position.coords.latitude;
-      this.form.longitude = position.coords.longitude;
-    });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.form.latitude = position.coords.latitude;
+        this.form.longitude = position.coords.longitude;
+      },
+      () => {
+        // Keep manual lat/lng entry available if permission is denied.
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      },
+    );
   }
 
   save(): void {

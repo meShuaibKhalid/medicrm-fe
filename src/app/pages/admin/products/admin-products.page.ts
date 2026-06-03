@@ -348,15 +348,6 @@ import { IonAlert } from '@ionic/angular/standalone';
                     class="field-group"
                     style="align-items: center; display: flex; height: 100%;"
                   >
-                    <label>Prescription Required</label>
-                    <ion-toggle
-                      formControlName="prescriptionRequired"
-                    ></ion-toggle>
-                  </div>
-                  <div
-                    class="field-group"
-                    style="align-items: center; display: flex; height: 100%;"
-                  >
                     <label>Active</label>
                     <ion-toggle formControlName="isActive"></ion-toggle>
                   </div>
@@ -844,7 +835,6 @@ export class AdminProductsPage implements OnDestroy {
     maxOrder: [10],
     primaryCategoryId: ['', Validators.required],
     usedFor: [''],
-    prescriptionRequired: [false],
     isActive: [true],
   });
 
@@ -945,7 +935,6 @@ export class AdminProductsPage implements OnDestroy {
       maxOrder: product.maxOrder,
       primaryCategoryId: product.primaryCategoryId || '',
       usedFor: product.usedFor,
-      prescriptionRequired: product.prescriptionRequired,
       isActive: product.isActive,
     });
     this.autoSlugValue = '';
@@ -1010,7 +999,6 @@ export class AdminProductsPage implements OnDestroy {
       maxOrder: 10,
       primaryCategoryId: '',
       usedFor: '',
-      prescriptionRequired: false,
       isActive: true,
     });
     this.autoSlugValue = '';
@@ -1147,10 +1135,6 @@ export class AdminProductsPage implements OnDestroy {
       JSON.stringify([value.primaryCategoryId || '']),
     );
     formData.append('usedFor', value.usedFor || '');
-    formData.append(
-      'prescriptionRequired',
-      String(Boolean(value.prescriptionRequired)),
-    );
     formData.append('isActive', String(Boolean(value.isActive)));
 
     if (this.selectedImageFile) {

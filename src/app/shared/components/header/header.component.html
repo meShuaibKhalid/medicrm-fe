@@ -64,7 +64,48 @@
           type="text"
           placeholder="Search for medicines & products..."
           aria-label="Search"
+          [ngModel]="searchTerm"
+          (ngModelChange)="onSearchInput($event)"
+          (focus)="searchTerm.trim() ? (searchOpen = true) : null"
         />
+      </div>
+      <div class="search-results" *ngIf="searchOpen">
+        <div class="search-status" *ngIf="isSearching">Searching...</div>
+
+        <ng-container *ngIf="searchProducts.length > 0">
+          <div class="search-section-label">Products</div>
+          <button
+            type="button"
+            class="search-result-item"
+            *ngFor="let product of searchProducts"
+            (click)="goToProduct(product)"
+          >
+            <img [src]="product.image" [alt]="product.title" />
+            <div class="search-result-copy">
+              <strong>{{ product.title }}</strong>
+              <span>{{ product.brand || 'No brand' }}</span>
+            </div>
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="searchBrands.length > 0">
+          <div class="search-section-label">Brands</div>
+          <button
+            type="button"
+            class="search-result-item"
+            *ngFor="let brand of searchBrands"
+            (click)="goToBrand(brand)"
+          >
+            <div class="search-result-copy">
+              <strong>{{ brand.name }}</strong>
+              <span>Brand</span>
+            </div>
+          </button>
+        </ng-container>
+
+        <div class="search-status" *ngIf="!isSearching && !searchProducts.length && !searchBrands.length">
+          No results found.
+        </div>
       </div>
     </div>
 

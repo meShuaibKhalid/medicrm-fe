@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import {
   IonButton,
   IonContent,
+  IonButtons,
+  IonBackButton,
   IonHeader,
   IonItem,
   IonLabel,
@@ -23,6 +25,8 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
     RouterLink,
     IonButton,
     IonContent,
+    IonButtons,
+    IonBackButton,
     IonHeader,
     IonItem,
     IonLabel,
@@ -33,23 +37,25 @@ import { EmptyStateComponent } from '../../shared/components/empty-state/empty-s
     EmptyStateComponent
   ],
   template: `
-    <ion-header class="ion-no-border"
-      ><ion-toolbar
-        ><ion-title class="header-title">My Orders</ion-title></ion-toolbar
-      ></ion-header
-    >
+    <ion-header class="ion-no-border">
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-back-button defaultHref="/home"></ion-back-button>
+        </ion-buttons>
+        <ion-title class="header-title">My Orders</ion-title>
+      </ion-toolbar>
+    </ion-header>
     <ion-content>
-       <div class="page-shell">
-      <ng-container *ngIf="!(orders$ | async)?.length">
-        <app-empty-state
-          title="No orders found"
-          message="You have not placed any orders yet."
-          icon="bag-handle-outline"
-        ></app-empty-state>
-      </ng-container>
+      <div class="page-shell">
+        <ng-container *ngIf="!(orders$ | async)?.length">
+          <app-empty-state
+            title="No orders found"
+            message="You have not placed any orders yet."
+            icon="bag-handle-outline"
+          ></app-empty-state>
+        </ng-container>
 
-      <ng-container *ngIf="(orders$ | async)?.length">
-       
+        <ng-container *ngIf="(orders$ | async)?.length">
           <ion-list class="soft-card">
             <ion-item *ngFor="let order of orders$ | async">
               <ion-label>

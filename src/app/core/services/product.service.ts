@@ -31,6 +31,41 @@ export class ProductService {
     return this.getProductsPage(params).pipe(map((response) => response.items));
   }
 
+  searchProducts(params?: ProductQueryParams): Observable<Product[]> {
+    let httpParams = new HttpParams()
+      .set('page', String(params?.page ?? 1))
+      .set('limit', String(params?.limit ?? 20))
+      .set('sort', this.mapSort(params?.sort));
+
+    if (params?.search?.trim()) {
+      httpParams = httpParams.set('search', params.search.trim());
+    }
+    if (params?.categorySlug) {
+      httpParams = httpParams.set('categorySlug', params.categorySlug);
+      httpParams = httpParams.set('includeDescendants', String(params.includeDescendants ?? true));
+    }
+    if (params?.brandSlug) {
+      httpParams = httpParams.set('brandSlug', params.brandSlug);
+    }
+    if (params?.inStock) {
+      httpParams = httpParams.set('inStock', 'true');
+    }
+    if (params?.prescriptionRequired !== undefined) {
+      httpParams = httpParams.set('prescriptionRequired', String(params.prescriptionRequired));
+    }
+    if (params?.priceMin !== null && params?.priceMin !== undefined) {
+      httpParams = httpParams.set('minPrice', String(params.priceMin));
+    }
+    if (params?.priceMax !== null && params?.priceMax !== undefined) {
+      httpParams = httpParams.set('maxPrice', String(params.priceMax));
+    }
+
+    return this.http.get<ApiResponse<PaginatedResult<any>>>(this.baseUrl, { params: httpParams }).pipe(
+      map((response) => response.data.items.map((product) => this.mapProduct(product))),
+      catchError(() => of([])),
+    );
+  }
+
   getProductsPage(params?: ProductQueryParams): Observable<PaginatedResult<Product>> {
     const page = params?.page ?? 1;
     const limit = params?.limit ?? 20;

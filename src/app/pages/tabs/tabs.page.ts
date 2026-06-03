@@ -15,10 +15,6 @@ import { CartService } from 'src/app/core/services/cart.service';
           <ion-icon name="home-outline"></ion-icon>
           <ion-label>Home</ion-label>
         </ion-tab-button>
-        <ion-tab-button tab="categories" href="/categories">
-          <ion-icon name="grid-outline"></ion-icon>
-          <ion-label>Categories</ion-label>
-        </ion-tab-button>
         <ion-tab-button tab="cart" href="/cart">
           <ion-icon name="bag-handle-outline"></ion-icon>
           <ion-label>Cart</ion-label>

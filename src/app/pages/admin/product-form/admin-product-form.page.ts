@@ -42,7 +42,6 @@ import { toSlug } from '../../../shared/utils/slug';
             </ion-select>
           </ion-item>
           <ion-item class="soft-card"><ion-label position="stacked">Used For</ion-label><ion-input formControlName="usedFor"></ion-input></ion-item>
-          <ion-item class="soft-card"><ion-label>Prescription Required</ion-label><ion-toggle formControlName="prescriptionRequired"></ion-toggle></ion-item>
           <ion-item class="soft-card"><ion-label>Active</ion-label><ion-toggle formControlName="isActive"></ion-toggle></ion-item>
           <ion-button expand="block" shape="round" (click)="save()">Save Product</ion-button>
         </form>
@@ -83,7 +82,6 @@ export class AdminProductFormPage {
     maxOrder: [1],
     primaryCategoryId: ['', Validators.required],
     usedFor: [''],
-    prescriptionRequired: [false],
     isActive: [true],
   });
 
