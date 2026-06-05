@@ -59,7 +59,7 @@
     <!-- Search Bar -->
     <div class="search-bar-container">
       <div class="search-bar">
-        <ion-icon name="search-outline" class="search-icon"></ion-icon>
+        <!-- <ion-icon name="search-outline" class="search-icon"></ion-icon> -->
         <input
           type="text"
           placeholder="Search for medicines & products..."
@@ -129,13 +129,13 @@
       </ng-container>
 
       <div
-        class="action-item hide-on-mobile cart-item"
+        class="action-item  cart-item"
         routerLink="/wishlist"
         tabindex="0"
         aria-label="Wishlist"
       >
         <ion-icon name="heart-outline"></ion-icon>
-        <span class="action-text">Wishlist</span>
+        <span class="action-text hide-on-mobile">Wishlist</span>
         <ion-badge
           color="primary"
           class="cart-badge"
@@ -144,7 +144,7 @@
         >
       </div>
       <div
-        class="action-item"
+        class="action-item hide-on-mobile"
         (click)="goToProfile()"
         tabindex="0"
         aria-label="Profile"

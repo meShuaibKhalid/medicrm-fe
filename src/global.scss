@@ -153,6 +153,12 @@ ion-content {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
   touch-action: pan-x;
+
+  @media (max-width: 768px) {
+    margin-left: -16px;
+    padding-inline: 16px;
+    width: 100vw;
+  }
 }
 
 .dvago-chip-list::-webkit-scrollbar {
@@ -634,6 +640,8 @@ ion-title.header-title {
     }
   }
 }
-ion-select,ion-input{
-  --highlight-color:transparent !important;
+
+ion-select,
+ion-input {
+  --highlight-color: transparent !important;
 }

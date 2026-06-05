@@ -87,9 +87,9 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
             <ion-badge [color]="product.stock > 0 ? 'success' : 'medium'">{{
               product.stock > 0 ? 'In Stock' : 'Out of Stock'
             }}</ion-badge>
-            <ion-badge *ngIf="product.prescriptionRequired" color="warning"
+            <!-- <ion-badge *ngIf="product.prescriptionRequired" color="warning"
               >Prescription Required</ion-badge
-            >
+            > -->
           </div>
         </div>
       </ion-card-content>
@@ -122,6 +122,9 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
       .cart-btn {
          transition: all .2s ease;
         opacity: 0;
+        @media (max-width: 768px) {
+          opacity: 1;
+        }
           &:hover{
             transform: scale(1.05);
             box-shadow: 0 6px 10px rgb(112 203 179 / 11%);
@@ -167,6 +170,7 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
           bottom: 5px;
           right: 5px;
           color: white;
+          cursor:pointer;
         }
       }
       ion-img {

@@ -225,7 +225,7 @@ export class CategoryProductsPage {
   get visiblePages(): number[] {
     const pages: number[] = [];
     const start = Math.max(1, this.currentPage - 2);
-    const end = Math.min(this.pagination.totalPages, start + 4);
+    const end = Math.min(this.pagination.totalPages, start + 3);
     for (let page = start; page <= end; page += 1) {
       pages.push(page);
     }

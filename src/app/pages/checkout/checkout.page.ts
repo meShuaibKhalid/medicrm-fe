@@ -2,6 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { addIcons } from 'ionicons';
+import {
+  logoWhatsapp,
+  informationCircleOutline,
+} from 'ionicons/icons';
+addIcons({
+  logoWhatsapp,
+  informationCircleOutline,
+});
 import {
   IonButton,
   IonCard,
@@ -323,6 +332,29 @@ import { Address } from '../../shared/models/app.models';
                   </button>
                 </div>
               </div>
+              <!-- Add this right after the iban-block div, still inside gateway-inner -->
+              <div class="payment-note">
+                <ion-icon
+                  name="information-circle-outline"
+                  class="note-icon"
+                ></ion-icon>
+                <div class="note-text">
+                  <p class="note-title">How to complete your payment</p>
+                  <p class="note-desc">
+                    <span>
+                      After transferring the amount, send a screenshot of your
+                      payment to our WhatsApp:
+                    </span>
+                    <a class="note-link" target="_blank" href="https://wa.me/923060162084">
+                      <ion-icon name="logo-whatsapp"></ion-icon>
+                      0306-0162084
+                    </a>
+                  </p>
+                  <p class="note-desc">
+                    Your order will be confirmed once payment is verified.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </ion-list>
@@ -383,7 +415,61 @@ import { Address } from '../../shared/models/app.models';
         letter-spacing: 0.7px;
         text-transform: uppercase;
       }
+      .payment-note {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: #f0fdf8;
+        border: 1.5px solid #d1fae5;
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin-top: 2px;
 
+        .note-icon {
+          color: #10b981;
+          font-size: 20px;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+
+        .note-text {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          width: 100%;
+        }
+
+        .note-title {
+          font-size: 13px;
+          font-weight: 700;
+          color: #0d1b2a;
+          margin: 0;
+        }
+
+        .note-desc {
+          font-size: 12px;
+          color: #64748b;
+          line-height: 1.5;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .note-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          color: #10b981;
+          font-weight: 700;
+          text-decoration: none;
+          margin-left: 4px;
+
+          ion-icon {
+            font-size: 14px;
+          }
+        }
+      }
       .method-row {
         --background: #fff;
         --border-color: #f0f9f5;
