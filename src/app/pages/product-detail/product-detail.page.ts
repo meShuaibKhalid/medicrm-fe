@@ -72,8 +72,10 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
           <ion-card class="soft-card">
             <!-- Image -->
             <div class="detail-image">
-              <ion-img [src]="product.image" [alt]="product.title"></ion-img>
-              <ion-badge
+            <ion-img 
+              [src]="product.image === 'https://www.dvago.pk/assets/dvago-logo.svg' ? '/assets/logo.png' : product.image" 
+              [alt]="product.title">
+            </ion-img>              <ion-badge
                 [color]="product.stock > 0 ? 'success' : 'medium'"
                 class="stock-overlay"
               >
@@ -231,6 +233,7 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
       }
       .soft-card {
         display: flex;
+        margin:0  ;
         @media (max-width: 768px) {
           flex-direction: column;
         }

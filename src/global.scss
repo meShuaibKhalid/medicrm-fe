@@ -63,13 +63,17 @@ ion-content {
   margin: 18px 0 14px;
 
   button {
-    background: linear-gradient(135deg, #10b981, #059669);
-    text-transform: uppercase;
+    background: linear-gradient(
+      135deg,
+      #10b981,
+      #059669);
+    text-transform: capitalize;
     padding: 8px 20px;
     font-size: 0.8rem !important;
     color: #fff !important;
     border-radius: var(--app-border-radius-small, 8px);
-    box-shadow: 0 15px 35px rgba(16, 185, 129, .25);
+    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.25);
+    font-weight: 700;
   }
 }
 
@@ -433,6 +437,9 @@ ion-title.header-title {
   justify-content: center;
   padding: 1rem;
   background: var(--color-ice-blue);
+  @media (max-width: 768px) {
+    min-height: calc(100vh - 90px);
+  }
 }
 
 .auth-card {
@@ -644,4 +651,14 @@ ion-title.header-title {
 ion-select,
 ion-input {
   --highlight-color: transparent !important;
+}
+ion-back-button {
+  margin-left: 10px;
+
+  &::part(text) {
+    display: none;
+  }
+  @media (min-width: 768px) {
+      position: absolute;
+  }
 }

@@ -43,7 +43,7 @@ import { Category } from '../../../shared/models/app.models';
   template: `
     <ion-content class="categories-content">
       <div class="page-shell">
-        <div class="top-bar">
+        <div class="section-title">
           <h2 class="page-heading">Categories</h2>
           <button class="add-btn" (click)="openAddModal()">Add Category</button>
         </div>
@@ -265,29 +265,9 @@ import { Category } from '../../../shared/models/app.models';
         gap: 14px;
       }
 
-      .top-bar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 6px;
-      }
-      .page-heading {
-        font-size: 20px;
-        font-weight: 700;
-        color: #2c1a22;
-        margin: 0;
-      }
-      .add-btn {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 12px;
-        letter-spacing: 0.03em;
-        cursor: pointer;
-      }
+      .section-title {
+          margin: 0;
+        }
 
       .search-wrap {
         height: 44px;

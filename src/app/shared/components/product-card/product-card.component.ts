@@ -18,7 +18,13 @@ import {
 import { Product } from '../../models/app.models';
 import { PriceDisplayComponent } from '../price-display/price-display.component';
 import { WishlistService } from 'src/app/core/services/wishlist.service';
-
+import { addIcons } from 'ionicons';
+import {
+  heart,
+} from 'ionicons/icons';
+addIcons({
+  heart,
+});
 @Component({
   selector: 'app-product-card',
   standalone: true,
@@ -105,6 +111,7 @@ import { WishlistService } from 'src/app/core/services/wishlist.service';
         padding: 10px;
         border: 1px solid var(--color-soft-blue-gray);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+        height: 100%;
         ion-card-content {
           text-align: left;
           padding: 5px 5px 5px 0;

@@ -11,24 +11,7 @@ addIcons({
   logoWhatsapp,
   informationCircleOutline,
 });
-import {
-  IonButton,
-  IonCard,
-  IonCardContent,
-  IonContent,
-  IonHeader,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonRadio,
-  IonRadioGroup,
-  IonSelect,
-  IonSelectOption,
-  IonTitle,
-  IonToolbar,
-  IonIcon,
-} from '@ionic/angular/standalone';
+import { IonButton, IonCard, IonCardContent, IonContent, IonHeader, IonInput, IonItem, IonLabel, IonList, IonRadio, IonRadioGroup, IonSelect, IonSelectOption, IonTitle, IonToolbar, IonIcon, IonButtons, IonBackButton } from '@ionic/angular/standalone';
 import { AddressService } from '../../core/services/address.service';
 import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
@@ -58,10 +41,15 @@ import { Address } from '../../shared/models/app.models';
     IonTitle,
     IonToolbar,
     IonIcon,
-  ],
+    IonButtons,
+    IonBackButton
+],
   template: `
     <ion-header class="ion-no-border">
       <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-back-button defaultHref="/cart"></ion-back-button>
+          </ion-buttons>
         <ion-title class="header-title">Checkout</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -469,6 +457,9 @@ import { Address } from '../../shared/models/app.models';
             font-size: 14px;
           }
         }
+      }
+      ion-card{
+        margin:0;
       }
       .method-row {
         --background: #fff;

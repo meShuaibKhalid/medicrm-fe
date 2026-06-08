@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, IonButtons, IonBackButton } from '@ionic/angular/standalone';
 import { OrderService } from '../../core/services/order.service';
 import { Order } from '../../shared/models/app.models';
 import { OrderStatusBadgeComponent } from '../../shared/components/order-status-badge/order-status-badge.component';
@@ -9,9 +9,14 @@ import { OrderStatusBadgeComponent } from '../../shared/components/order-status-
 @Component({
   selector: 'app-order-detail',
   standalone: true,
-  imports: [CommonModule, IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, OrderStatusBadgeComponent],
+  imports: [CommonModule, IonCard, IonCardContent, IonContent, IonHeader, IonItem, IonLabel, IonList, IonTitle, IonToolbar, OrderStatusBadgeComponent, IonButtons, IonBackButton],
   template: `
-    <ion-header class="ion-no-border"><ion-toolbar><ion-title class="header-title">Order Detail</ion-title></ion-toolbar></ion-header>
+    <ion-header class="ion-no-border"><ion-toolbar>
+             <ion-buttons slot="start">
+          <ion-back-button defaultHref="/orders"></ion-back-button>
+        </ion-buttons>
+      <ion-title class="header-title">Order Detail</ion-title>
+    </ion-toolbar></ion-header>
     <ion-content *ngIf="order">
       <div class="page-shell">
         <ion-card class="soft-card">

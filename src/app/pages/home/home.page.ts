@@ -21,13 +21,12 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
             <ion-badge color="success">Fast delivery</ion-badge>
             <h2>Order medicines online</h2>
             <p>Shop pharmacy products, daily essentials, and health support with a cleaner storefront inspired by the reference layout.</p>
-            <ion-button shape="round" routerLink="/categories">Shop Now</ion-button>
+            <button class="shop-btn" routerLink="/categories">Shop Now</button>
           </ion-card-content>
         </ion-card>
 
         <div class="section-title">
           <h2>Trending Categories</h2>
-          <button>View All</button>
         </div>
         <div class="dvago-chip-list">
           <button class="dvago-outlined-chip" *ngFor="let category of categories" [routerLink]="['/categories', category.slug, 'products']">{{ category.name }}</button>
@@ -35,7 +34,6 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 
         <div class="section-title">
           <h2>Featured Products</h2>
-          <button>View All</button>
         </div>
         <div class="product-grid">
           <app-product-card *ngFor="let product of filteredFeaturedProducts" [product]="product" (addToCart)="addToCart($event)" (openProduct)="openProduct($event)"></app-product-card>
@@ -43,14 +41,10 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 
         <div class="section-title">
           <h2>Discounted Products</h2>
-        <button>View All</button></div>
+        </div>
         <div class="product-grid">
           <app-product-card *ngFor="let product of filteredDiscountedProducts" [product]="product" (addToCart)="addToCart($event)" (openProduct)="openProduct($event)"></app-product-card>
         </div>
-
-        <div class="section-title">
-          <h2>Devices & Support</h2>
-          <button>View All</button></div>
       </div>
     </ion-content>
 
@@ -61,9 +55,35 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
     }
     .hero {
       margin: 8px 0 26px;
-      background: linear-gradient(135deg, #fff6f8, #ffffff);
       color: #2e2e2e;
       border-radius: 20px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #EBF3FC 100%);
+      background-image: url('/assets/banner.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: right center;
+      @media (max-width: 768px) {
+        background-image: none;
+        background: linear-gradient(135deg, #fff6f8, #ffffff);
+      }
+      .shop-btn{
+            background: linear-gradient(
+            135deg,
+            #10b981,
+            #059669);
+          text-transform: capitalize;
+          padding: 8px 20px;
+          font-size: 0.8rem !important;
+          color: #fff !important;
+          border-radius: var(--app-border-radius-small, 8px);
+          box-shadow: 0 15px 35px rgba(16, 185, 129, 0.25);
+          font-weight: 700;
+      }
+      ion-card-content {
+        @media (min-width: 768px) {
+          width: 60%;
+        }
+      }
     }
     .hero h2 {
       margin: 12px 0 8px;

@@ -200,19 +200,6 @@ import { toSlug } from '../../../shared/utils/slug';
         gap: 14px;
         .section-title {
           margin: 0;
-          margin-bottom: 6px;
-          button {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 12px;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            text-transform: capitalize;
-          }
         }
         .theme-search {
           --background: #ffffff;

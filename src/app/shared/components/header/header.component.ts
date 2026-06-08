@@ -13,7 +13,13 @@ import { AddressService } from '../../../core/services/address.service';
 import { Brand, Category, Address, Product } from '../../../shared/models/app.models';
 import { ProductService } from '../../../core/services/product.service';
 import { BrandService } from '../../../core/services/brand.service';
-
+import { addIcons } from 'ionicons';
+import {
+  shieldOutline,
+} from 'ionicons/icons';
+addIcons({
+  shieldOutline,
+});
 @Component({
   selector: 'app-header',
   standalone: true,

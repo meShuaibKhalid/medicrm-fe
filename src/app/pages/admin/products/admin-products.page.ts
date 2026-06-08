@@ -395,18 +395,6 @@ import { IonAlert } from '@ionic/angular/standalone';
         gap: 14px;
         .section-title {
           margin: 0;
-          .add-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 12px;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            text-transform: capitalize;
-          }
         }
       }
 

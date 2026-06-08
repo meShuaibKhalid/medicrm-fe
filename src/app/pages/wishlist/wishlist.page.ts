@@ -24,7 +24,9 @@ import { PriceDisplayComponent } from '../../shared/components/price-display/pri
           <div class="wishlist-list">
             <div class="wishlist-item" *ngFor="let item of wishlist.items">
               <div class="item-img" [routerLink]="['/products', item.product.slug]">
-                <img [src]="item.product.image" [alt]="item.product.title" />
+                <img
+                [src]="item.product.image === 'https://www.dvago.pk/assets/dvago-logo.svg' ? '/assets/logo.png' : item.product.image" 
+                 [alt]="item.product.title" />
               </div>
               <div class="item-info">
                 <p class="item-title" [routerLink]="['/products', item.product.slug]">{{ item.product.title }}</p>
