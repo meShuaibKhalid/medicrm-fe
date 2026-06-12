@@ -30,6 +30,7 @@ import {
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
+import { register } from 'swiper/element/bundle';
 
 addIcons({
   'apps-outline': appsOutline,
@@ -53,7 +54,7 @@ addIcons({
   'receipt-outline': receiptOutline,
   'shield-checkmark-outline': shieldCheckmarkOutline,
 });
-
+register();
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

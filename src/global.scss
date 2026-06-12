@@ -24,6 +24,9 @@
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
 
 * {
   font-family: "Poppins", sans-serif;
@@ -51,7 +54,7 @@ ion-content {
 
 .page-shell {
   padding: 16px 16px 10px;
-  max-width: 1500px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -650,7 +653,10 @@ ion-title.header-title {
 
 ion-select,
 ion-input {
-  --highlight-color: transparent !important;
+  --highlight-height: 1px !important;
+}
+ion-item{
+  --background:transparent;
 }
 ion-back-button {
   margin-left: 10px;

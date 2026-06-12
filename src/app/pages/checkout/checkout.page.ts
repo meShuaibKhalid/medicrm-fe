@@ -190,7 +190,7 @@ import { Address } from '../../shared/models/app.models';
           </ion-item>
 
           <!-- Online Transfer -->
-          <ion-item
+         <!-- <ion-item
             lines="none"
             class="method-row"
             button
@@ -221,10 +221,8 @@ import { Address } from '../../shared/models/app.models';
             </ion-icon>
           </ion-item>
 
-          <!-- Gateway panel -->
           <div class="gateway-panel" [class.open]="transferPanelOpen">
             <div class="gateway-inner">
-              <!-- JazzCash -->
               <div
                 class="gw-row"
                 [class.selected]="selectedGateway === 'jazzcash'"
@@ -252,7 +250,6 @@ import { Address } from '../../shared/models/app.models';
                 </div>
               </div>
 
-              <!-- Easypaisa -->
               <div
                 class="gw-row"
                 [class.selected]="selectedGateway === 'easypaisa'"
@@ -280,7 +277,6 @@ import { Address } from '../../shared/models/app.models';
                 </div>
               </div>
 
-              <!-- Bank Transfer -->
               <div
                 class="gw-row"
                 [class.selected]="selectedGateway === 'bank'"
@@ -297,8 +293,6 @@ import { Address } from '../../shared/models/app.models';
                   ✓
                 </div>
               </div>
-
-              <!-- IBAN block -->
               <div class="iban-block" *ngIf="selectedGateway === 'bank'">
                 <div class="iban-label">Bank details</div>
                 <div class="iban-row">
@@ -320,8 +314,7 @@ import { Address } from '../../shared/models/app.models';
                   </button>
                 </div>
               </div>
-              <!-- Add this right after the iban-block div, still inside gateway-inner -->
-              <div class="payment-note">
+               <div class="payment-note">
                 <ion-icon
                   name="information-circle-outline"
                   class="note-icon"
@@ -344,7 +337,7 @@ import { Address } from '../../shared/models/app.models';
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </ion-list>
 
         <ion-button
