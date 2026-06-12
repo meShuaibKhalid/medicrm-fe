@@ -189,8 +189,10 @@ addIcons({
         display: flex;
         gap: 10px;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-end;
         margin-top: 10px;
+        height: 43px;
+        white-space: nowrap;
       }
       .meta h3 {
         font-weight: 600;

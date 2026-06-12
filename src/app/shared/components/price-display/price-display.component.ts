@@ -16,7 +16,7 @@ import { IonBadge } from '@ionic/angular/standalone';
     </div>
   `,
   styles: [`
-    .price-wrap { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .price-wrap { display:flex; align-items:flex-end; justify-content:space-between; gap:8px; }
     .prices { display:flex; flex-direction:column; gap:2px; }
     strong { 
           display: -webkit-box;

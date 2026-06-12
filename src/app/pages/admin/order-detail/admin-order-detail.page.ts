@@ -98,7 +98,7 @@ import { OrderStatusBadgeComponent } from '../../../shared/components/order-stat
                   class="coord-pill"
                   *ngIf="order.address.latitude && order.address.longitude"
                 >
-                  <ion-icon name="globe-outline"></ion-icon>
+                  <ion-icon name="location-outline"></ion-icon>
                   {{ order.address.latitude }}, {{ order.address.longitude }}
                 </span>
               </div>
@@ -434,6 +434,14 @@ import { OrderStatusBadgeComponent } from '../../../shared/components/order-stat
         --border-radius: 50px;
         height: 52px;
         font-weight: 700;
+      }
+      ion-list {
+        background: transparent;
+      }
+      @media (min-width: 768px) {
+        ion-back-button {
+          position: static !important;
+        }
       }
     `,
   ],
